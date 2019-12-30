@@ -36,6 +36,7 @@ int main(void)
             }
         }
     }
+    
 
     SDL_DestroyWindow(window);
     SDL_FreeSurface(image_surface);
