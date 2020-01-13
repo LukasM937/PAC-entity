@@ -92,12 +92,12 @@ void toTextureDestination (char input, int *outX, int *outY)
             break;
         
         case 1:             // Point
-            outX = 100;
-            outY = 150;
+            outX = 0;
+            outY = 200;
             break;
         case 0:             // Empty
-            outX = 100;
-            outY = 150;
+            outX = 50;
+            outY = 200;
             break;
     }
 
