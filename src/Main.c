@@ -27,7 +27,7 @@ int main(void)
     SDL_Window* window = SDL_CreateWindow("Hello, Fenster!",
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       640, 480, 0);
+                                       950, 1100, 0);
     if (!window)
     {
         printf("error creating window: %s\n", SDL_GetError());
@@ -79,7 +79,6 @@ int main(void)
 
     SDL_UpdateWindowSurface(window);
 
-    
     while (quit == 0)
     {
         //move(one, points);
