@@ -3,9 +3,9 @@
 # uebersichtlicher zu gestalten.
 #
 
-CC = gcc
-CFLAGS = -std=c99 -pedantic -Wall -Wextra
-SDLFLAG = `sdl2-config --cflags --libs`
+CC = clang
+CFLAGS = `sdl2-config --libs --cflags -lSDL2 -lSDLImage2` -ggdb3 -O0 --std=c99 -Wall -lSDL2_image -lm #-std=c99 -pedantic -Wall -Wextra -lSDL2_image -lm
+#SDLFLAG = `sdl2-config --cflags --libs -lSDL2 -lSDLImage2`
 OUT = PAC-entity.out
 EXE = PAC-entity.out
 
@@ -36,6 +36,6 @@ EXE = PAC-entity.out
 
 PAC-entity.exe:
 
-	$(CC) $(CFLAGS) -o PAC-entity.out Main.c $(SDLFLAG)
+	$(CC) $(CFLAGS) -o PAC-entity.out Main.c
 	
 	./PAC-entity.out

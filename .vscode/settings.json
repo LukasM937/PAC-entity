@@ -1,5 +1,15 @@
 {
     "files.associations": {
-        "sdl.h": "c"
-    }
+        "sdl.h": "c",
+        "sdl_image.h": "c",
+        "sdl_timer.h": "c",
+        "array": "c",
+        "deque": "c",
+        "iterator": "c",
+        "string": "c",
+        "string_view": "c",
+        "vector": "c",
+        "pac-entity.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
