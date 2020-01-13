@@ -3,9 +3,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 #include <SDL_timer.h>
-#include </Users/lmuehrke/Documents/GitHub/PAC-entity/sdl2/2.0.10/include/SDL2/SDL_image.h>
+#include <SDL2/SDL_image.h>
 
-#include "Pac-entity.h"
+//#include "Pac-entity.h"
 //#include "assets.h"
 
 typedef struct player
@@ -14,29 +14,26 @@ typedef struct player
     int posY;
 } player;
 
-// void move(void* arg, SDL_Point& points)
-// {
-//     player* one = (player*)arg;
-//     one->posX = WINDOW_WIDTH/2;
-//     one->posY = WINDOW_HEIGHT/2;
-
-//     points = {{one->posX - 50, one->posY - 50},
-//             {one->posX + 50, one->posY - 50},
-//             {one->posX + 50, one->posY + 50},
-//             {one->posX - 50, one->posY + 50}
-//     };
-// }
-
 int main(void)
 {
     player* one = malloc(sizeof(player));
 
-    SDL_Init(SDL_INIT_VIDEO);
+    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0)
+    {
+        printf("error initializing SDL: %s\n", SDL_GetError());
+        return 1;
+    }
 
-    SDL_Window * window = NULL;
-
-    // SDL_Surface * window_surface = NULL;
-    SDL_Surface * image_surface = NULL;
+    SDL_Window* window = SDL_CreateWindow("Hello, Fenster!",
+                                       SDL_WINDOWPOS_CENTERED,
+                                       SDL_WINDOWPOS_CENTERED,
+                                       640, 480, 0);
+    if (!window)
+    {
+        printf("error creating window: %s\n", SDL_GetError());
+        SDL_Quit();
+	    return 1;
+    }
 
     // create a renderer, which sets up the graphics hardware
     Uint32 render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
@@ -49,7 +46,7 @@ int main(void)
       return 1;
     }
 
-    SDL_Surface* surface = IMG_Load("assets/PAC-entity_frameless.png");
+    SDL_Surface* surface = IMG_Load("/Users/lmuehrke/Documents/GitHub/PAC-entity/assset/Map_elements.png");
     if (!surface)
     {
         printf("error creating surface\n");
@@ -77,17 +74,8 @@ int main(void)
     SDL_RenderCopy(renderer, tex, NULL, NULL);
     SDL_RenderPresent(renderer);
 
-    // wait a few seconds
-    SDL_Delay(5000);
-
     SDL_Event event;
     int quit = 0;
-    if(SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer) == 0)
-    {
-        quit = 0;
-    }
-
-    //window_surface = SDL_GetWindowSurface(window);
 
     SDL_UpdateWindowSurface(window);
 
@@ -95,12 +83,12 @@ int main(void)
     while (quit == 0)
     {
         //move(one, points);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+        /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
         SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer);*/
 
         while (SDL_PollEvent(&event))
         {
@@ -134,8 +122,9 @@ int main(void)
     }
 
 
+    SDL_DestroyTexture(tex);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    SDL_FreeSurface(image_surface);
     SDL_Quit();
 
     return 0;
