@@ -7,6 +7,7 @@
 
 //#include "Pac-entity.h"
 //#include "assets.h"
+#include "background.h"
 
 typedef struct player
 {
@@ -46,7 +47,7 @@ int main(void)
       return 1;
     }
 
-    SDL_Surface* surface = IMG_Load("/Users/lmuehrke/Documents/GitHub/PAC-entity/assset/Map_elements.png");
+    SDL_Surface* surface = IMG_Load("/assset/Background.png");
     if (!surface)
     {
         printf("error creating surface\n");
@@ -66,13 +67,50 @@ int main(void)
         SDL_Quit();
         return 1;
     }
-
+    
     // clear the window
     SDL_RenderClear(renderer);
-    
-    // draw the image to the window
-    SDL_RenderCopy(renderer, tex, NULL, NULL);
-    SDL_RenderPresent(renderer);
+
+    texture(window, renderer, tex);
+    /*
+    SDL_Texture* mapTiles;
+
+    //Uint32 render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+    //SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, render_flags);
+
+    surface = IMG_Load("/assset/Map_elements.png");
+    mapTiles = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    SDL_Rect targetRect;
+    SDL_Rect sourceRect;
+
+    for(int i = 0; i < 22; i++)
+    {
+        printf("%d\n", i);
+        for(int j = 0; j < 19; j++)
+        {
+            printf("%d\n", j);
+            targetRect.x = blockSize * j;
+            targetRect.y = blockSize * i;
+            targetRect.w = blockSize;
+            targetRect.h = blockSize;
+
+            sourceRect.w = blockSize;
+            sourceRect.h = blockSize;
+
+            toTextureDestination(background[i][j], &sourceRect.x, &sourceRect.y);
+            SDL_RenderCopy(renderer, tex, NULL, NULL);
+            SDL_RenderCopy(renderer, mapTiles, &sourceRect, &targetRect);
+            SDL_RenderPresent(renderer);
+        }
+    }
+
+    SDL_DestroyTexture(tex);
+    SDL_DestroyTexture(mapTiles);
+    SDL_DestroyRenderer(renderer);
+    */
+
 
     SDL_Event event;
     int quit = 0;
