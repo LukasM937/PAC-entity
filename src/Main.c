@@ -28,7 +28,7 @@ int main(void)
     SDL_Window* window = SDL_CreateWindow("Hello, Fenster!",
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       950, 1100, 0);
+                                       blockSize*19, blockSize*22, 0);
     if (!window)
     {
         printf("error creating window: %s\n", SDL_GetError());
@@ -47,7 +47,7 @@ int main(void)
       return 1;
     }
 
-    SDL_Surface* surface = IMG_Load("/assset/Background.png");
+    SDL_Surface* surface = IMG_Load("/assset/Background_Map.bmp");
     if (!surface)
     {
         printf("error creating surface\n");
@@ -71,7 +71,7 @@ int main(void)
     // clear the window
     SDL_RenderClear(renderer);
 
-    texture(window, renderer, tex);
+    //texture(window, renderer, tex);
     /*
     SDL_Texture* mapTiles;
 
@@ -110,7 +110,7 @@ int main(void)
     SDL_DestroyTexture(mapTiles);
     SDL_DestroyRenderer(renderer);
     */
-
+    
 
     SDL_Event event;
     int quit = 0;
@@ -119,13 +119,8 @@ int main(void)
 
     while (quit == 0)
     {
-        //move(one, points);
-        /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(renderer);
-
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLines(renderer, points, POINTS_COUNT);
-        SDL_RenderPresent(renderer);*/
+        
+        SDL_RenderPresent(renderer);
 
         while (SDL_PollEvent(&event))
         {
