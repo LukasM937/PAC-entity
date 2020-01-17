@@ -17,18 +17,13 @@ typedef struct player
 
 int main(void)
 {
-    player* one = malloc(sizeof(player));
-
-    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0)
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
-        printf("error initializing SDL: %s\n", SDL_GetError());
+        printf("Im Arsch: %s \n", SDL_GetError());
         return 1;
     }
 
-    SDL_Window* window = SDL_CreateWindow("Pac-entity",
-                                       SDL_WINDOWPOS_CENTERED,
-                                       SDL_WINDOWPOS_CENTERED,
-                                       blockSize*19, blockSize*22, 0);
+    SDL_Window* window = SDL_CreateWindow("Pac-entity", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, blockSize*19, blockSize*22, SDL_WINDOW_SHOWN);
     if (!window)
     {
         printf("error creating window: %s\n", SDL_GetError());
