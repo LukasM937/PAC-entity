@@ -89,16 +89,12 @@ int main(void)
                 /* Check the SDLKey values and move change the coords */
                 switch( event.key.keysym.sym ){
                     case SDLK_LEFT:
-                        one->posX -= 1;
                         break;
                     case SDLK_RIGHT:
-                        one->posX  += 1;
                         break;
                     case SDLK_UP:
-                        one->posY  -= 1;
                         break;
                     case SDLK_DOWN:
-                        one->posY += 1;
                         break;
                     case SDLK_ESCAPE:
                         quit =1;
