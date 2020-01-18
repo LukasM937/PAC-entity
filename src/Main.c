@@ -7,49 +7,54 @@
 #include <SDL_timer.h>
 #include <SDL2/SDL_image.h>
 
-//#include "Pac-entity.h"
-//#include "assets.h"
 #include "background.h"
 
 #define SCREEN_WIDTH 950
 #define SCREEN_HEIGHT 1100
 #define SHAPE_SIZE 40
+#define FPS_Cap 60
+#define PAC_SPEED 600
+#define PAC_START_X 450
+#define PAC_START_Y 800
 
 typedef struct player
 {
-    int posX;
-    int posY;
+    int x;
+    int y;
+    int rotation;
+    int speed;
 } player;
 
-bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1){
-        //int pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
-        //int puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
-
-        int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
-        int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
-
-        if(background [puffery1] [pufferx1] == 0 || background [puffery1] [pufferx1] == 1){
-            return true;
-        }
-        else return false;
-}
-// bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1, int back[][ary]){
-//         int pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
-//         int puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
-
-//         int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
-//         int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
-
-//         if((back[puffery][pufferx]==0 || back[puffery][pufferx]==1 )&& (background [puffery1] [pufferx1] == 0 || background [puffery1] [pufferx1] == 1)){
-//             return true;
-//         }
-//         else return false;
+// bool validPath(int pos_x, int pos_y, int rotation, int target)
+// {
+//     if((rotation == 0 && (pos_y%blockSize == 0)||(rotation == 180 && (pos_y%blockSize == 0))
+//     {
+//         return true;
+//     }
+//     if((rotation == 90 && (pos_x%blockSize == 0)||(rotation == 270 && (pos_x%blockSize == 0))
+//     {
+//         return true;
+//     }
+//     return false;
 // }
 
+bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1)
+{
+    int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
+    int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
 
+    if(background [puffery1] [pufferx1] == 0 || background [puffery1] [pufferx1] == 1)
+    {
+        return true;
+    }
+    else return false;
+}
 
 int main(void)
 {
+    player pac;
+    pac.speed = PAC_SPEED/FPS_Cap;
+
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("Im Arsch: %s \n", SDL_GetError());
@@ -86,7 +91,6 @@ int main(void)
     }
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, background);
-    SDL_FreeSurface(background);
     if (!tex)
     {
         printf("error creating texture: %s\n", SDL_GetError());
@@ -124,16 +128,19 @@ int main(void)
         SDL_Quit();
         return 1;
     }
-    SDL_FreeSurface(image);
+    //SDL_FreeSurface(image);
     
     //erstellt das viereck in dem pacman dargestellt wird
-    SDL_Rect immageposition;
-    immageposition.x = 100;
-    immageposition.y = 50;
-    immageposition.w = SHAPE_SIZE;
-    immageposition.h = SHAPE_SIZE;
+    SDL_Rect pacPosition;
+    pacPosition.x = PAC_START_X;
+    pacPosition.y = PAC_START_Y;
+    pacPosition.w = SHAPE_SIZE;
+    pacPosition.h = SHAPE_SIZE;
+
+    float y_pos = pacPosition.y;
+    float x_pos = pacPosition.x;
     
-    SDL_RenderCopy(renderer, pacEntity, NULL, &immageposition);
+    SDL_RenderCopy(renderer, pacEntity, NULL, &pacPosition);
     SDL_RenderPresent(renderer);
 
     //Pacman dreht seine Ausrichtung wenn er in eine andere richtung bewegt wir
@@ -146,7 +153,9 @@ int main(void)
     SDL_UpdateWindowSurface(window);
 
     while (running)
-    { 
+    {
+        SDL_RenderClear(renderer);
+
         while (SDL_PollEvent(&event))
         {
             switch(event.type )
@@ -160,31 +169,32 @@ int main(void)
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_LEFT:
-                        if(immageposition.x > 0 && canimove(19, 22, immageposition.x-1, immageposition.y, immageposition.x-1, immageposition.y+immageposition.h)==true)
+                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-1, pacPosition.y, pacPosition.x-1, pacPosition.y+pacPosition.h)==true)
                         {
-                            immageposition.x --; rotation=180;
-                            printf("left\n");
+                            pac.rotation=180;
+                            // printf("left\n");
                         }
                         break;
                     case SDLK_RIGHT:
-                        if(immageposition.x < SCREEN_WIDTH && canimove(19, 22,immageposition.x+immageposition.w+1, immageposition.y, immageposition.x +immageposition.w +1, immageposition.y+immageposition.h)==true)
+                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22,pacPosition.x+pacPosition.w+1, pacPosition.y, pacPosition.x +pacPosition.w +1, pacPosition.y+pacPosition.h)==true)
                         {
-                            immageposition.x ++; rotation=0;
-                            printf("right\n");
+                            pac.rotation=0;
+                            // printf("right\n");
                         }
                         break;
                     case SDLK_UP:
-                        if(immageposition.y > 0 && canimove(19, 22, immageposition.x, immageposition.y-1, immageposition.x+immageposition.w, immageposition.y-1)==true)
+                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x, pacPosition.y-1, pacPosition.x+pacPosition.w, pacPosition.y-1)==true)
                         {
-                            immageposition.y --; rotation=270; 
-                            printf("up\n");
+                            pac.rotation=270; 
+                            // printf("up\n",);
                         }
                         break;
                     case SDLK_DOWN:
-                        if(immageposition.y < SCREEN_HEIGHT && canimove(19, 22, immageposition.x, immageposition.y+immageposition.h+1,immageposition.x+immageposition.w, immageposition.y+immageposition.h+1)==true)
+                        rotation = pac.rotation;
+                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+1,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+1)==true)
                         {
-                            immageposition.y ++; rotation=90;
-                            printf("down\n");
+                            pac.rotation=90;
+                            // printf("down\n");
                         }
                         break;
                     case SDLK_ESCAPE:
@@ -195,9 +205,70 @@ int main(void)
                 }
             }
         }
+        //läd pacman ins fenster und repräsentiert alles
+        pacPosition.y = (int) y_pos;
+        pacPosition.x = (int) x_pos;
+        
+        SDL_RenderCopy(renderer, tex, NULL, NULL);
+        SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
+        SDL_RenderPresent(renderer);
+
+        //pac Animation
+        switch (pac.rotation)
+        {
+        case 0:                         //right
+            x_pos += (float) pac.speed;
+            if(canimove(19, 22,pacPosition.x+pacPosition.w+20, pacPosition.y, pacPosition.x +pacPosition.w +20, pacPosition.y+pacPosition.h))
+            {
+                pac.speed = PAC_SPEED/FPS_Cap;
+            }
+            else
+            {
+                pac.speed = 0;
+            }
+            break;
+        case 90:                        //down
+            y_pos += (float) pac.speed;
+            if(canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+20,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+20))
+            {
+                pac.speed = PAC_SPEED/FPS_Cap;
+            }
+            else
+            {
+                pac.speed = 0;
+            }
+            break;
+        case 180:                       //left
+            x_pos -= (float) pac.speed;
+            if(canimove(19, 22, pacPosition.x-20, pacPosition.y, pacPosition.x-20, pacPosition.y+pacPosition.h))
+            {
+                pac.speed = PAC_SPEED/FPS_Cap;
+            }
+            else
+            {
+                pac.speed = 0;
+            }
+            break;
+        case 270:                       //up
+            y_pos -= (float) pac.speed;
+            if(canimove(19, 22, pacPosition.x, pacPosition.y-20, pacPosition.x+pacPosition.w, pacPosition.y-20))
+            {
+                pac.speed = PAC_SPEED/FPS_Cap;
+            }
+            else
+            {
+                pac.speed = 0;
+            }
+            break;
+        
+        default:
+            break;
+        }
+        SDL_Delay(1000/60);
     }
     
-
+    SDL_FreeSurface(image);
+    SDL_FreeSurface(background);
     SDL_DestroyTexture(tex);
     SDL_DestroyTexture(pacEntity);
     SDL_DestroyRenderer(renderer);
