@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
@@ -13,9 +14,10 @@
 #define SCREEN_HEIGHT 1100
 #define SHAPE_SIZE 40
 #define FPS_Cap 60
-#define PAC_SPEED 600
+#define PAC_SPEED 60
 #define PAC_START_X 450
-#define PAC_START_Y 800
+#define PAC_START_Y 805
+#define BUMPER 10
 
 typedef struct player
 {
@@ -38,7 +40,7 @@ typedef struct player
 //     return false;
 // }
 
-bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1)
+bool canimove(int arx, int ary, int pox1, int poy1)
 {
     int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
     int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
@@ -52,6 +54,10 @@ bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1)
 
 int main(void)
 {
+    time_t start_t, end_t;
+    double diff_t;
+    int fpsDiff;
+    
     player pac;
     pac.speed = PAC_SPEED/FPS_Cap;
 
@@ -80,8 +86,17 @@ int main(void)
       return 1;
     }
     
-    SDL_Surface* background = IMG_Load("/assets/Background_Map.bmp");
-    if (!background)
+    SDL_Surface* backSurface = IMG_Load("/assets/Background_Map.bmp");
+    if (!backSurface)
+    {
+        printf("error creating surface\n");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    SDL_Surface* mapElements = IMG_Load("/assets/Map_elements.png");
+    if (!mapElements)
     {
         printf("error creating surface\n");
         SDL_DestroyRenderer(renderer);
@@ -90,8 +105,8 @@ int main(void)
         return 1;
     }
 
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, background);
-    if (!tex)
+    SDL_Texture* backTexture = SDL_CreateTextureFromSurface(renderer, backSurface);
+    if (!backTexture)
     {
         printf("error creating texture: %s\n", SDL_GetError());
         SDL_DestroyRenderer(renderer);
@@ -103,10 +118,29 @@ int main(void)
     // clear the window
     SDL_RenderClear(renderer);
 
-    SDL_RenderCopy(renderer, tex, NULL, NULL);
+    SDL_RenderCopy(renderer, backTexture, NULL, NULL);
     SDL_RenderPresent(renderer);
 
     SDL_RenderClear(renderer);
+
+    // Points
+    SDL_Texture* pointTexture = SDL_CreateTextureFromSurface(renderer, mapElements);
+    if (!pointTexture)
+    {
+        printf("error creating texture: %s\n", SDL_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Rect targetRect;
+    SDL_Rect sourceRect;
+    targetRect.w = blockSize;
+    targetRect.h = blockSize;
+
+    sourceRect.w = blockSize;
+    sourceRect.h = blockSize;
 
     //Pac-entity zeug
     
@@ -128,7 +162,6 @@ int main(void)
         SDL_Quit();
         return 1;
     }
-    //SDL_FreeSurface(image);
     
     //erstellt das viereck in dem pacman dargestellt wird
     SDL_Rect pacPosition;
@@ -154,6 +187,7 @@ int main(void)
 
     while (running)
     {
+        time(&start_t);
         SDL_RenderClear(renderer);
 
         while (SDL_PollEvent(&event))
@@ -169,21 +203,21 @@ int main(void)
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_LEFT:
-                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-1, pacPosition.y, pacPosition.x-1, pacPosition.y+pacPosition.h)==true)
+                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h)==true)
                         {
                             pac.rotation=180;
                             // printf("left\n");
                         }
                         break;
                     case SDLK_RIGHT:
-                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22,pacPosition.x+pacPosition.w+1, pacPosition.y, pacPosition.x +pacPosition.w +1, pacPosition.y+pacPosition.h)==true)
+                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h)==true)
                         {
                             pac.rotation=0;
                             // printf("right\n");
                         }
                         break;
                     case SDLK_UP:
-                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x, pacPosition.y-1, pacPosition.x+pacPosition.w, pacPosition.y-1)==true)
+                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER)==true)
                         {
                             pac.rotation=270; 
                             // printf("up\n",);
@@ -191,7 +225,7 @@ int main(void)
                         break;
                     case SDLK_DOWN:
                         rotation = pac.rotation;
-                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+1,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+1)==true)
+                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER)==true)
                         {
                             pac.rotation=90;
                             // printf("down\n");
@@ -205,71 +239,96 @@ int main(void)
                 }
             }
         }
+        
         //läd pacman ins fenster und repräsentiert alles
         pacPosition.y = (int) y_pos;
         pacPosition.x = (int) x_pos;
         
-        SDL_RenderCopy(renderer, tex, NULL, NULL);
+        SDL_RenderCopy(renderer, backTexture, NULL, NULL);
+        for(int i = 0; i < 22; i++)
+        {
+            for(int j = 0; j < 19; j++)
+            {
+                targetRect.x = blockSize * j;
+                targetRect.y = blockSize * i;
+        
+                if(background[i][j] == 1)
+                {
+                    sourceRect.x = 0;
+                    sourceRect.y = 200;
+                    SDL_RenderCopy(renderer, pointTexture, &sourceRect, &targetRect);
+                }   
+            }
+        }
+
         SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
         SDL_RenderPresent(renderer);
 
         //pac Animation
         switch (pac.rotation)
         {
-        case 0:                         //right
-            x_pos += (float) pac.speed;
-            if(canimove(19, 22,pacPosition.x+pacPosition.w+20, pacPosition.y, pacPosition.x +pacPosition.w +20, pacPosition.y+pacPosition.h))
-            {
-                pac.speed = PAC_SPEED/FPS_Cap;
-            }
-            else
-            {
-                pac.speed = 0;
-            }
-            break;
-        case 90:                        //down
-            y_pos += (float) pac.speed;
-            if(canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+20,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+20))
-            {
-                pac.speed = PAC_SPEED/FPS_Cap;
-            }
-            else
-            {
-                pac.speed = 0;
-            }
-            break;
-        case 180:                       //left
-            x_pos -= (float) pac.speed;
-            if(canimove(19, 22, pacPosition.x-20, pacPosition.y, pacPosition.x-20, pacPosition.y+pacPosition.h))
-            {
-                pac.speed = PAC_SPEED/FPS_Cap;
-            }
-            else
-            {
-                pac.speed = 0;
-            }
-            break;
-        case 270:                       //up
-            y_pos -= (float) pac.speed;
-            if(canimove(19, 22, pacPosition.x, pacPosition.y-20, pacPosition.x+pacPosition.w, pacPosition.y-20))
-            {
-                pac.speed = PAC_SPEED/FPS_Cap;
-            }
-            else
-            {
-                pac.speed = 0;
-            }
-            break;
-        
-        default:
-            break;
+            case 0:                         //right
+                x_pos += (float) pac.speed;
+                if(canimove(19, 22, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            case 90:                        //down
+                y_pos += (float) pac.speed;
+                if(canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            case 180:                       //left
+                x_pos -= (float) pac.speed;
+                if(canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            case 270:                       //up
+                y_pos -= (float) pac.speed;
+                if(canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y-(BUMPER)))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            
+            default:
+                break;
         }
-        SDL_Delay(1000/60);
+
+        time(&end_t);
+        diff_t = difftime(end_t, start_t);
+        fpsDiff = 60 - diff_t;
+        printf("%d \n", fpsDiff);
+
+        SDL_Delay(1000/fpsDiff);
     }
     
     SDL_FreeSurface(image);
-    SDL_FreeSurface(background);
-    SDL_DestroyTexture(tex);
+    SDL_FreeSurface(backSurface);
+    SDL_FreeSurface(mapElements);
+    SDL_DestroyTexture(backTexture);
+    SDL_DestroyTexture(pointTexture);
     SDL_DestroyTexture(pacEntity);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
