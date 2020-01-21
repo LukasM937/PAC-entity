@@ -14,7 +14,7 @@
 #define SCREEN_HEIGHT 1100
 #define SHAPE_SIZE 40
 #define FPS_Cap 60
-#define PAC_SPEED 60
+#define PAC_SPEED 300
 #define PAC_START_X 450
 #define PAC_START_Y 805
 #define BUMPER 10
@@ -27,25 +27,27 @@ typedef struct player
     int speed;
 } player;
 
-// bool validPath(int pos_x, int pos_y, int rotation, int target)
-// {
-//     if((rotation == 0 && (pos_y%blockSize == 0)||(rotation == 180 && (pos_y%blockSize == 0))
-//     {
-//         return true;
-//     }
-//     if((rotation == 90 && (pos_x%blockSize == 0)||(rotation == 270 && (pos_x%blockSize == 0))
-//     {
-//         return true;
-//     }
-//     return false;
-// }
+int validPathX (int x)
+{
+    int a;
+    a = x % 50;
+
+    return a;
+}
+int validPathY (int y)
+{
+    int a;
+    a = y % 50;
+
+    return a;
+}
 
 bool canimove(int arx, int ary, int pox1, int poy1)
 {
     int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
     int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
 
-    if(background [puffery1] [pufferx1] == 0 || background [puffery1] [pufferx1] == 1)
+    if(background [puffery1] [pufferx1] <= 1)
     {
         return true;
     }
@@ -57,6 +59,7 @@ int main(void)
     time_t start_t, end_t;
     double diff_t;
     int fpsDiff;
+    int a;
     
     player pac;
     pac.speed = PAC_SPEED/FPS_Cap;
@@ -203,21 +206,21 @@ int main(void)
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_LEFT:
-                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h)==true)
+                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h)==true && validPathY(pacPosition.y) <= 5)
                         {
                             pac.rotation=180;
                             // printf("left\n");
                         }
                         break;
                     case SDLK_RIGHT:
-                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h)==true)
+                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h)==true && validPathY(pacPosition.y) <= 5)
                         {
                             pac.rotation=0;
                             // printf("right\n");
                         }
                         break;
                     case SDLK_UP:
-                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER)==true)
+                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER)==true && validPathX(pacPosition.x) <= 5)
                         {
                             pac.rotation=270; 
                             // printf("up\n",);
@@ -225,7 +228,7 @@ int main(void)
                         break;
                     case SDLK_DOWN:
                         rotation = pac.rotation;
-                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER)==true)
+                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER)==true && validPathX(pacPosition.x) <= 5)
                         {
                             pac.rotation=90;
                             // printf("down\n");
@@ -315,11 +318,14 @@ int main(void)
             default:
                 break;
         }
+        a = validPathX(pacPosition.x);
+        //printf("%d, ", a);
+        a = validPathY(pacPosition.y);
+        //printf("%d \n", a);
 
         time(&end_t);
         diff_t = difftime(end_t, start_t);
         fpsDiff = 60 - diff_t;
-        printf("%d \n", fpsDiff);
 
         SDL_Delay(1000/fpsDiff);
     }
@@ -327,9 +333,11 @@ int main(void)
     SDL_FreeSurface(image);
     SDL_FreeSurface(backSurface);
     SDL_FreeSurface(mapElements);
+
     SDL_DestroyTexture(backTexture);
     SDL_DestroyTexture(pointTexture);
     SDL_DestroyTexture(pacEntity);
+    
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
