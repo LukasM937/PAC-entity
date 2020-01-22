@@ -71,6 +71,8 @@ int main(void)
         return 1;
     }
 
+    //TODO -- make the Window bigger and show a scoreboards.
+
     SDL_Window* window = SDL_CreateWindow("Pac-entity", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window)
     {
@@ -269,6 +271,9 @@ int main(void)
         SDL_RenderPresent(renderer);
 
         //pac Animation
+
+        //TODO --  enter a comand buffer to change directions in faster game. 
+        //     --  Only alow direction change on valid paths (x,y)%50 = (5,5).
         switch (pac.rotation)
         {
             case 0:                         //right (5)
@@ -319,9 +324,9 @@ int main(void)
             default:
                 break;
         }
-        a = validPathX(pacPosition.x);
+        // a = validPathX(pacPosition.x);
         // printf("%d, ", a);
-        a = validPathY(pacPosition.y);
+        // a = validPathY(pacPosition.y);
         // printf("%d \n", a);
 
         time(&end_t);
