@@ -24,28 +24,28 @@
                 {Y,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,I}
 };*/
 
-int background[22][19]= {{2,15,15,15,15,15,15,15,15,6,15,15,15,15,15,15,15,15,3},
-                {14,1,1,1,1,1,1,1,1,14,1,1,1,1,1,1,1,1,14},
-                {14,1,2,3,1,2,6,3,1,14,1,2,6,3,1,2,3,1,14},
-                {14,1,5,4,1,5,6,4,1,12,1,5,6,4,1,5,4,1,14},
-                {14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,14},
-                {14,1,13,11,1,10,1,13,15,6,15,11,1,10,1,13,11,1,14},
-                {14,1,1,1,1,14,1,1,1,14,1,1,1,14,1,1,1,1,14},
-                {5,15,15,3,1,9,15,11,1,12,1,13,15,7,1,2,15,15,4},
-                {0,0,0,14,1,14,1,1,1,1,1,1,1,14,1,14,0,0,0},
-                {15,15,15,4,1,12,1,2,17,18,19,3,1,12,1,5,15,15,15},
-                {1,1,1,1,1,1,1,14,0,0,0,14,1,1,1,1,1,1,1},
-                {15,15,15,3,1,10,1,5,15,15,15,4,1,10,1,2,15,15,15},
-                {0,0,0,14,1,14,1,1,1,1,1,1,1,14,1,14,0,0,0},
-                {2,15,15,4,1,12,1,13,15,6,15,11,1,12,1,5,15,15,15},
-                {14,1,1,1,1,1,1,1,1,14,1,1,1,1,1,1,1,1,14},
-                {14,1,13,3,1,13,15,11,1,12,1,13,15,11,1,2,11,1,14},
-                {14,1,1,14,1,1,1,1,1,1,1,1,1,1,1,14,1,1,14},
-                {9,11,1,12,1,10,1,13,15,6,15,11,1,10,1,12,1,13,7},
-                {14,1,1,1,1,14,1,1,1,14,1,1,1,14,1,1,1,1,14},
-                {14,1,13,15,15,8,15,11,1,12,1,13,15,8,15,15,11,1,14},
-                {14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,14},
-                {5,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,4}
+int background[22][19]= {{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
+                {2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2},
+                {2,1,2,2,1,2,2,2,1,2,1,2,2,2,1,2,2,1,2},
+                {2,1,2,2,1,2,2,2,1,2,1,2,2,2,1,2,2,1,2},
+                {2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2},
+                {2,1,2,2,1,2,1,2,2,2,2,2,1,2,1,2,2,1,2},
+                {2,1,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,1,2},
+                {2,2,2,2,1,2,2,2,1,2,1,2,2,2,1,2,2,2,2},
+                {0,0,0,2,1,2,1,1,1,1,1,1,1,2,1,2,0,0,0},
+                {2,2,2,2,1,2,1,2,2,2,2,2,1,2,1,2,2,2,2},
+                {1,1,1,1,1,1,1,2,0,0,0,2,1,1,1,1,1,1,1},
+                {2,2,2,2,1,2,1,2,2,2,2,2,1,2,1,2,2,2,2},
+                {0,0,0,2,1,2,1,1,1,1,1,1,1,2,1,2,0,0,0},
+                {2,2,2,2,1,2,1,2,2,2,2,2,1,2,1,2,2,2,2},
+                {2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2},
+                {2,1,2,2,1,2,2,2,1,2,1,2,2,2,1,2,2,1,2},
+                {2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2},
+                {2,2,1,2,1,2,1,2,2,2,2,2,1,2,1,2,1,2,2},
+                {2,1,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,1,2},
+                {2,1,2,2,2,2,2,2,1,2,1,2,2,2,2,2,2,1,2},
+                {2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2},
+                {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
 };
 
 void toTextureDestination(int input, int *outX, int *outY)
@@ -53,69 +53,69 @@ void toTextureDestination(int input, int *outX, int *outY)
     switch(input)
     {
         printf(" ");
-        case 2:             //Upper left Corner 2/q
-            *outX = 0;
-            *outY = 0;
-            break;
-        case 3:             //Upper right Corner 3/e
-            *outX = 50;
-            *outY = 0;
-            break;
-        case 4:             //Lower left Corner 4/c
-            *outX = 50;
-            *outY = 50;
-            break;
-        case 5:             //Lower right Corner 5/y
-            *outX = 0;
-            *outY = 50;
-            break;
+        // case 2:             //Upper left Corner 2/q
+        //     *outX = 0;
+        //     *outY = 0;
+        //     break;
+        // case 3:             //Upper right Corner 3/e
+        //     *outX = 50;
+        //     *outY = 0;
+        //     break;
+        // case 4:             //Lower left Corner 4/c
+        //     *outX = 50;
+        //     *outY = 50;
+        //     break;
+        // case 5:             //Lower right Corner 5/y
+        //     *outX = 0;
+        //     *outY = 50;
+        //     break;
 
-        case 6:             // T down 6/w
-            *outX = 150;
-            *outY = 50;
-            break;
-        case 7:             // T left 7/d
-            *outX = 150;
-            *outY = 150;
-            break;
-        case 8:             // T up 8/x
-            *outX = 100;
-            *outY = 200;
-            break;
-        case 9:             // T right 9/a
-            *outX = 0;
-            *outY = 150;
-            break;
+        // case 6:             // T down 6/w
+        //     *outX = 150;
+        //     *outY = 50;
+        //     break;
+        // case 7:             // T left 7/d
+        //     *outX = 150;
+        //     *outY = 150;
+        //     break;
+        // case 8:             // T up 8/x
+        //     *outX = 100;
+        //     *outY = 200;
+        //     break;
+        // case 9:             // T right 9/a
+        //     *outX = 0;
+        //     *outY = 150;
+        //     break;
         
-        case 10:             // upper End 10/h
-            *outX = 100;
-            *outY = 50;
-            break;
-        case 11:             // right End 11/j
-            *outX = 50;
-            *outY = 100;
-            break;
-        case 12:             // lower End 12/k
-            *outX = 150;
-            *outY = 100;
-            break;
-        case 13:             // left End 13/l
-            *outX = 0;
-            *outY = 100;
-            break;
+        // case 10:             // upper End 10/h
+        //     *outX = 100;
+        //     *outY = 50;
+        //     break;
+        // case 11:             // right End 11/j
+        //     *outX = 50;
+        //     *outY = 100;
+        //     break;
+        // case 12:             // lower End 12/k
+        //     *outX = 150;
+        //     *outY = 100;
+        //     break;
+        // case 13:             // left End 13/l
+        //     *outX = 0;
+        //     *outY = 100;
+        //     break;
         
-        case 14:             // standig Wall 14/i
-            *outX = 100;
-            *outY = 100;
-            break;
-        case 15:             // laying Wall 15/z
-            *outX = 50;
-            *outY = 150;
-            break;
-        case 16:             // Cross 16/s
-            *outX = 100;
-            *outY = 150;
-            break;
+        // case 14:             // standig Wall 14/i
+        //     *outX = 100;
+        //     *outY = 100;
+        //     break;
+        // case 15:             // laying Wall 15/z
+        //     *outX = 50;
+        //     *outY = 150;
+        //     break;
+        // case 16:             // Cross 16/s
+        //     *outX = 100;
+        //     *outY = 150;
+        //     break;
         
         case 1:             // Point
             *outX = 0;
@@ -154,16 +154,16 @@ void texture(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* tex)
         for(int j = 0; j < 19; j++)
         {
             //SDL_RenderClear(renderer);
-            targetRect.x = blockSize * j;
-            targetRect.y = blockSize * i;
+            targetRect.x = 100;
+            targetRect.y = 100;
             targetRect.w = blockSize;
             targetRect.h = blockSize;
 
             sourceRect.w = blockSize;
             sourceRect.h = blockSize;
 
-            //toTextureDestination(background[i][j], &sourceRect.x, &sourceRect.y);
-            
+            toTextureDestination(background[i][j], &sourceRect.x, &sourceRect.y);
+            /*
             switch(background[i][j])
             {
                 printf(" ");
@@ -244,6 +244,8 @@ void texture(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* tex)
                     sourceRect.y = 200;
                     break;
             }
+            */
+
             SDL_RenderCopy(renderer, tex, NULL, NULL);
             SDL_RenderCopy(renderer, mapTiles, &sourceRect, &targetRect);
             SDL_SetRenderTarget(renderer, NULL);
