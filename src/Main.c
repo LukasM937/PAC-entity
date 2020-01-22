@@ -42,16 +42,17 @@ int validPathY (int y)
     return a;
 }
 
-bool canimove(int arx, int ary, int pox1, int poy1)
-{
-    int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
-    int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
+bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1, int back[][ary]){
+        int pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
+        int puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
 
-    if(background [puffery1] [pufferx1] <= 1)
-    {
-        return true;
-    }
-    else return false;
+        int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
+        int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
+
+        if(background[puffery][pufferx]==0 || (background[puffery][pufferx]==1 && background[puffery1][pufferx1] == 0) || background[puffery1][pufferx1] == 1){
+            return true;
+        }
+        else return false;
 }
 
 int main(void)
@@ -206,21 +207,21 @@ int main(void)
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_LEFT:
-                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h)==true && validPathY(pacPosition.y) <= 5)
+                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h, background) == true)
                         {
                             pac.rotation=180;
                             // printf("left\n");
                         }
                         break;
                     case SDLK_RIGHT:
-                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h)==true && validPathY(pacPosition.y) <= 5)
+                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22,pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, background) == true)
                         {
                             pac.rotation=0;
                             // printf("right\n");
                         }
                         break;
                     case SDLK_UP:
-                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER)==true && validPathX(pacPosition.x) <= 5)
+                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x, pacPosition.y-BUMPER, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER, background) == true)
                         {
                             pac.rotation=270; 
                             // printf("up\n",);
@@ -228,7 +229,7 @@ int main(void)
                         break;
                     case SDLK_DOWN:
                         rotation = pac.rotation;
-                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER)==true && validPathX(pacPosition.x) <= 5)
+                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, background) == true)
                         {
                             pac.rotation=90;
                             // printf("down\n");
@@ -270,9 +271,9 @@ int main(void)
         //pac Animation
         switch (pac.rotation)
         {
-            case 0:                         //right
+            case 0:                         //right (5)
                 x_pos += (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h))
+                if(canimove(19, 22,pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, background))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -281,9 +282,9 @@ int main(void)
                     pac.speed = 0;
                 }
                 break;
-            case 90:                        //down
+            case 90:                        //down (5)
                 y_pos += (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER))
+                if(canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, background))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -292,9 +293,9 @@ int main(void)
                     pac.speed = 0;
                 }
                 break;
-            case 180:                       //left
+            case 180:                       //left (5)
                 x_pos -= (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h))
+                if(canimove(19, 22, pacPosition.x-BUMPER-5, pacPosition.y, pacPosition.x-BUMPER-5, pacPosition.y+pacPosition.h, background))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -303,9 +304,9 @@ int main(void)
                     pac.speed = 0;
                 }
                 break;
-            case 270:                       //up
+            case 270:                       //up (5)
                 y_pos -= (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x+pacPosition.w, pacPosition.y-(BUMPER)))
+                if(canimove(19, 22, pacPosition.x, pacPosition.y-BUMPER-5, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER-5, background))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -319,13 +320,14 @@ int main(void)
                 break;
         }
         a = validPathX(pacPosition.x);
-        //printf("%d, ", a);
+        // printf("%d, ", a);
         a = validPathY(pacPosition.y);
-        //printf("%d \n", a);
+        // printf("%d \n", a);
 
         time(&end_t);
         diff_t = difftime(end_t, start_t);
         fpsDiff = 60 - diff_t;
+        // printf("%d \n", fpsDiff);
 
         SDL_Delay(1000/fpsDiff);
     }
