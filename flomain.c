@@ -1,31 +1,18 @@
-//Da ist jetzt noch alles drinnen ich teile das später in 2 Dateien 
-//Das mit dem Münzenzählen mache ich heute abend mal 
-
 #include <SDL.h>
 #undef main
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "lukas.h"
+#include "flomove.h"
 
 #define SHAPE_SIZE 20
+
+extern int background[22][19];
 
 const int SCREEN_WIDTH = 475;
 const int SCREEN_HEIGHT = 500;
 
 
-bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1, int back[][ary]){
-        int pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
-        int puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
-
-        int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
-        int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
-
-        if(back[puffery][pufferx]==0 || back[puffery][pufferx]==1 && background [puffery1] [pufferx1] == 0 || background [puffery1] [pufferx1] == 1){
-            return true;
-        }
-        else return false;
-}
 
 int main(int argc, char* argv[]) {
     
@@ -60,8 +47,6 @@ int main(int argc, char* argv[]) {
         immageposition.y=50;
         immageposition.w=SHAPE_SIZE;
         immageposition.h=SHAPE_SIZE;
-
-        
         
         //Hintergrund wird rot -> wege auf denen pacman gehen darf
         SDL_SetRenderDrawColor(render, 255, 0, 0, 0);
@@ -85,6 +70,15 @@ int main(int argc, char* argv[]) {
         //Pacman dreht seine Ausrichtung wenn er in eine andere richtung bewegt wir
         int rotation;
         
+        //zählt die münzen hoch
+        int munzenzahler=0;
+
+        //schritte die Pacman auf einmal geht
+        int speed=4;
+        
+        //Leben = Äpfel
+        int apfel=1;
+
         bool running = true;
         SDL_Event event;
 
@@ -93,29 +87,15 @@ int main(int argc, char* argv[]) {
             while(SDL_PollEvent(&event)){
                 switch(event.type) {
                     case SDL_QUIT: running = false; break;
-                    case SDL_KEYDOWN:
-                        switch(event.key.keysym.sym){
-                            case SDLK_UP: if(immageposition.y > 0 && canimove(19, 22, immageposition.x, immageposition.y-1, immageposition.x+immageposition.w, immageposition.y-1, background)==true) {
-                                immageposition.y --; rotation=270; }
-                                break;
-                            
-                            case SDLK_DOWN: if(immageposition.y < SCREEN_HEIGHT && canimove(19, 22, immageposition.x, immageposition.y+immageposition.h+1,immageposition.x+immageposition.w, immageposition.y+immageposition.h+1, background)==true){
-                                immageposition.y ++; rotation=90;}
-                                break;
-                            
-                            case SDLK_RIGHT: if(immageposition.x < SCREEN_WIDTH && canimove(19, 22,immageposition.x+immageposition.w+1, immageposition.y, immageposition.x +immageposition.w +1, immageposition.y+immageposition.h, background)==true){
-                                immageposition.x ++; rotation=0;}
-                                break;
-                            
-                            case SDLK_LEFT: if(immageposition.x > 0 && canimove(19, 22, immageposition.x-1, immageposition.y, immageposition.x-1, immageposition.y+immageposition.h, background)==true){
-                                immageposition.x --; rotation=180;} 
-                                break;
-                            
-                        } break;
+                    case SDL_KEYDOWN: postionV2(event, &immageposition, speed, &rotation, &munzenzahler, &apfel);
+                                    //postion( event, &immageposition, &rotation, &munzenzahler, &apfel);
+                                     break;
                 }
             } 
             
-            //erstellt hintergrund neu
+            if(apfel==0) running=false;
+
+            //erstellt Hintergrund neu
             SDL_RenderClear(render);
             SDL_SetRenderDrawColor(render, 255, 0, 0, 0);
             SDL_RenderClear(render);
@@ -129,12 +109,13 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
-
+            
             //läd pacman ins fenster und repräsentiert alles
             SDL_RenderCopyEx(render, texi, NULL, &immageposition, rotation, NULL, SDL_FLIP_NONE);
             SDL_RenderPresent(render);
         }
 
+        printf("Muenzen: %d", munzenzahler);
         //speicher wieder freigeben und aus sdl rausgehen
         SDL_DestroyTexture(texi);
         SDL_DestroyRenderer(render);
