@@ -19,6 +19,8 @@
 #define PAC_START_Y 805
 #define BUMPER 10
 #define BUFFER_LENGTH 10
+#define BACKGROUND_H 22
+#define BACKGROUND_W 19
 
 typedef struct player
 {
@@ -45,21 +47,138 @@ int validPathY (int y)
     return 0;
 }
 
-bool canimove(int arx, int ary, int pox, int poy, int pox1, int poy1, int back[][ary]){
-        int pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
-        int puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
+bool canimove(int *was, int speed, int pox, int poy, int pox1, int poy1, int *munzenzahler, int *apfel)
+{
+    int arx = BACKGROUND_W;
+    int ary = BACKGROUND_W;
+    int buf= *was;
+    int pufferx, puffery, pufferx1, puffery1;
 
-        int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
-        int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
+    for(int i=1; i<=speed; i++)
+    {
+        if(buf==1)
+        {
+            pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
+            puffery = (int)((double)(poy-i)/(double)(SCREEN_HEIGHT/ary));
 
-        if(background[puffery][pufferx]==0 || background[puffery][pufferx]==1 && background[puffery1][pufferx1] == 0 || background[puffery1][pufferx1] == 1){
-            return true;
+            pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
+            puffery1 = (int)((double)(poy1-i)/(double)(SCREEN_HEIGHT/ary));
         }
-        else return false;
+        else if(buf==2)
+        {
+            pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/arx));
+            puffery = (int)((double)(poy+i)/(double)(SCREEN_HEIGHT/ary));
+
+            pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/arx));
+            puffery1 = (int)((double)(poy1+i)/(double)(SCREEN_HEIGHT/ary));
+        }
+        else if(buf==3)
+        {
+            pufferx = (int)((double)(pox+i)/(double)(SCREEN_WIDTH/arx));
+            puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
+
+            pufferx1 = (int)((double)(pox1+i)/(double)(SCREEN_WIDTH/arx));
+            puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
+        }
+        else if(buf==4)
+        {
+            pufferx = (int)((double)(pox-i)/(double)(SCREEN_WIDTH/arx));
+            puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ary));
+
+            pufferx1 = (int)((double)(pox1-i)/(double)(SCREEN_WIDTH/arx));
+            puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ary));
+        }
+
+        if((background[puffery][pufferx]==0 || background[puffery][pufferx]==1 || background[puffery][pufferx]==22) && (background[puffery1] [pufferx1] == 0 || background[puffery1] [pufferx1] == 1 || background[puffery1][pufferx1]==22))
+        {
+            *was=i;
+
+            if(background[puffery][pufferx]==22)
+            {
+                *apfel=*apfel+1;
+                background[puffery][pufferx]=0;
+            }
+            else if(background[puffery1][pufferx1]==22)
+            {
+                *apfel=*apfel+1;
+                background[puffery][pufferx]=0;
+            }
+            if(background[puffery][pufferx]==1)
+            {
+                *munzenzahler=*munzenzahler+1;
+                background[puffery][pufferx]=0;
+            }
+            else if(background[puffery1][pufferx1]==1)
+            {
+                *munzenzahler=*munzenzahler+1;
+                background[puffery1][pufferx1]=0;
+            }
+        }
+        else if (i==1)
+        {
+            return false;
+        }
+        else return true;
+    }
+    return true;
+}
+
+void postionV2(SDL_Event event, SDL_Rect* pacPosition, int *speed, int *rotation, int *munzenzahler, int *apfel){
+    int *was, o;
+    was=&o;
+    switch(event.key.keysym.sym)
+    {
+        case SDLK_UP: 
+            *was=1;
+            if(pacPosition->y > 0 && canimove(was, *speed, pacPosition->x, pacPosition->y, pacPosition->x+pacPosition->w, pacPosition->y, munzenzahler, apfel)==true)
+            {
+                pacPosition->y = pacPosition->y- *was; *rotation=270;
+                printf("%d \n", *rotation);
+            }
+            break;
+        
+        case SDLK_DOWN: 
+            *was=2;
+            if(pacPosition->y < SCREEN_HEIGHT && canimove(was, *speed, pacPosition->x, pacPosition->y+pacPosition->h,pacPosition->x+pacPosition->w, pacPosition->y+pacPosition->h, munzenzahler, apfel)==true)
+            {
+                pacPosition->y = pacPosition->y+*was; *rotation=90;
+                printf("%d \n", *rotation);
+            }
+            break;
+        
+        case SDLK_RIGHT: 
+            *was=3;
+            if(pacPosition->x < SCREEN_WIDTH && canimove(was, *speed, pacPosition->x+pacPosition->w, pacPosition->y, pacPosition->x+pacPosition->w , pacPosition->y+pacPosition->h, munzenzahler, apfel)==true)
+            {
+                pacPosition->x = pacPosition->x+ *was; *rotation=0;
+                printf("%d \n", *rotation);
+            }
+            break;
+        
+        case SDLK_LEFT: 
+            *was=4;
+            if(pacPosition->x > 0 && canimove(was, *speed, pacPosition->x, pacPosition->y, pacPosition->x, pacPosition->y+pacPosition->h, munzenzahler, apfel)==true)
+            {
+                pacPosition->x=pacPosition->x-*was; *rotation=180;
+                printf("%d \n", *rotation);
+            } 
+            break;
+        default:
+            break;
+    }
 }
 
 int main(void)
 {
+    time_t start_t, end_t;
+    double diff_t;
+    int fpsDiff;
+    int a;
+    int munzenzahler=0;
+    int *apfel = NULL;
+    int *was, o;
+    was = &o;
+
     SDL_Keycode *buffer;
 
     buffer = malloc(BUFFER_LENGTH * sizeof(SDL_Keycode));
@@ -67,11 +186,6 @@ int main(void)
     {
         buffer[k] = 0;
     }
-
-    time_t start_t, end_t;
-    double diff_t;
-    int fpsDiff;
-    int a;
     
     player pac;
     pac.speed = PAC_SPEED/FPS_Cap;
@@ -103,7 +217,7 @@ int main(void)
       SDL_Quit();
       return 1;
     }
-    
+
     SDL_Surface* backSurface = IMG_Load("/assets/Background_Map.bmp");
     if (!backSurface)
     {
@@ -140,7 +254,7 @@ int main(void)
     SDL_RenderPresent(renderer);
 
     SDL_RenderClear(renderer);
-
+    
     // Points
     SDL_Texture* pointTexture = SDL_CreateTextureFromSurface(renderer, mapElements);
     if (!pointTexture)
@@ -180,13 +294,34 @@ int main(void)
         SDL_Quit();
         return 1;
     }
-    
+
+    SDL_Surface * loadedSurface = IMG_Load("/assets/PAC-Ghost_cyan_frameless.png");
+    if (!loadedSurface)
+    {
+        printf("error creating surface\n");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    SDL_Texture* ghostTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    if (ghostTexture == NULL) {
+        printf("Unable to create texture from Surface");
+
+    }
+
     //erstellt das viereck in dem pacman dargestellt wird
     SDL_Rect pacPosition;
     pacPosition.x = PAC_START_X;
     pacPosition.y = PAC_START_Y;
     pacPosition.w = SHAPE_SIZE;
     pacPosition.h = SHAPE_SIZE;
+
+    SDL_Rect ghostposition;
+    ghostposition.x = 225;
+    ghostposition.y = 175;
+    ghostposition.w = SHAPE_SIZE;
+    ghostposition.h = SHAPE_SIZE;
 
     float y_pos = pacPosition.y;
     float x_pos = pacPosition.x;
@@ -213,6 +348,7 @@ int main(void)
 
         while (SDL_PollEvent(&event))
         {
+            
             switch(event.type )
             {
                 case SDL_QUIT:
@@ -220,39 +356,54 @@ int main(void)
                     break;
                 /* Look for a keypress */
                 case SDL_KEYDOWN:
+                    switch(event.key.keysym.sym)
+                    {
+                        case SDLK_ESCAPE:
+                            running = false;
+                            break;
+
+                        default:
+                            postionV2(event, &pacPosition, &pac.speed, &pac.rotation, &munzenzahler, apfel);
+                            break;
+                    }
+
                 /* Check the SDLKey values and move change the coords */
+                /*
                 switch(event.key.keysym.sym)
                 {
                     case SDLK_LEFT:
-                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h, background) == true)
+                        *was = 4;
+                        if(pacPosition.x > 0 && canimove(was, pac.speed, pacPosition.x-BUMPER, pacPosition.y, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h, &munzenzahler, apfel) == true)
                         {
-                            buffer[0] = SDLK_LEFT;
-                            // pac.rotation=180;
+                            // buffer[0] = SDLK_LEFT;
+                            pac.rotation=180;
                             // printf("left\n");
                         }
                         break;
                     case SDLK_RIGHT:
-                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22,pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, background) == true)
+                        *was = 3;
+                        if(pacPosition.x < SCREEN_WIDTH && canimove(was, pac.speed, pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h,  &munzenzahler, apfel) == true)
                         {
-                            buffer[0] = SDLK_RIGHT;
-                            // pac.rotation=0;
+                            // buffer[0] = SDLK_RIGHT;
+                            pac.rotation=0;
                             // printf("right\n");
                         }
                         break;
                     case SDLK_UP:
-                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x, pacPosition.y-BUMPER, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER, background) == true)
+                        *was = 1;
+                        if(pacPosition.y > 0 && canimove(was, pac.speed, pacPosition.x, pacPosition.y-BUMPER, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER, &munzenzahler, apfel) == true)
                         {
-                            buffer[0] = SDLK_UP;
-                            // pac.rotation=270; 
+                            // buffer[0] = SDLK_UP;
+                            pac.rotation=270; 
                             // printf("up\n",);
                         }
                         break;
                     case SDLK_DOWN:
-                        // rotation = pac.rotation;
-                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, background) == true)
+                        *was = 2;
+                        if(pacPosition.y < SCREEN_HEIGHT && canimove(was, pac.speed, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, &munzenzahler, apfel) == true)
                         {
-                            buffer[0] = SDLK_DOWN;
-                            // pac.rotation=90;
+                            // buffer[0] = SDLK_DOWN;
+                            pac.rotation=90;
                             // printf("down\n");
                         }
                         break;
@@ -262,9 +413,11 @@ int main(void)
                     default:
                         break;
                 }
+                */
             }
         }
         // printf("a \n");
+        /*
         if((validPathX(pacPosition.x) == 1 && (pac.rotation == 90 || pac.rotation == 270 )) || (validPathY(pacPosition.y) == 1 && (pac.rotation == 0 || pac.rotation == 180 )) || pac.speed == 0)
         {
             // printf("b \n");
@@ -275,9 +428,9 @@ int main(void)
                     switch (buffer[l])
                     {
                     case SDLK_LEFT:
-                        if(pacPosition.x > 0 && canimove(19, 22, pacPosition.x-BUMPER, pacPosition.y, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h, background) == true)
+                        if(pacPosition.x > 0 && canimove(was, pac.speed, pacPosition.x-BUMPER, pacPosition.y, pacPosition.x-BUMPER, pacPosition.y+pacPosition.h, &munzenzahler, apfel) == true)
                         {
-                            pac.rotation=180;
+                            pac.rotation = 180;
                             for(int k = 0; k < BUFFER_LENGTH; k++)
                             {
                                 buffer[k] = 0;
@@ -285,9 +438,9 @@ int main(void)
                         }
                         break;
                     case SDLK_RIGHT:
-                        if(pacPosition.x < SCREEN_WIDTH && canimove(19, 22,pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, background) == true)
+                        if(pacPosition.x < SCREEN_WIDTH && canimove(was, pac.speed, pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h,  &munzenzahler, apfel) == true)
                         {
-                            pac.rotation=0;
+                            pac.rotation = 0;
                             for(int k = 0; k < BUFFER_LENGTH; k++)
                             {
                                 buffer[k] = 0;
@@ -295,9 +448,9 @@ int main(void)
                         }
                         break;
                     case SDLK_UP:
-                        if(pacPosition.y > 0 && canimove(19, 22, pacPosition.x, pacPosition.y-BUMPER, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER, background) == true)
+                        if(pacPosition.y > 0 && canimove(was, pac.speed, pacPosition.x, pacPosition.y-BUMPER, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER, &munzenzahler, apfel) == true)
                         {
-                            pac.rotation=270;
+                            pac.rotation = 270;
                             for(int k = 0; k < BUFFER_LENGTH; k++)
                             {
                                 buffer[k] = 0;
@@ -305,9 +458,9 @@ int main(void)
                         }
                         break;
                     case SDLK_DOWN:
-                        if(pacPosition.y < SCREEN_HEIGHT && canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, background) == true)
+                        if(pacPosition.y < SCREEN_HEIGHT && canimove(was, pac.speed, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, &munzenzahler, apfel) == true)
                         {
-                            pac.rotation=90;
+                            pac.rotation = 90;
                             for(int k = 0; k < BUFFER_LENGTH; k++)
                             {
                                 buffer[k] = 0;
@@ -320,6 +473,7 @@ int main(void)
                 }
             }
         }
+        */
 
         //läd pacman ins fenster und repräsentiert alles
         pacPosition.y = (int) y_pos;
@@ -342,18 +496,97 @@ int main(void)
             }
         }
 
+        //GeisterBewegung
+
+        if (pacPosition.y < ghostposition.y) 
+        {
+            if(canimove(was, pac.speed, ghostposition.x, ghostposition.y - 1, ghostposition.x + ghostposition.w, ghostposition.y - 1, &munzenzahler, apfel)== true)//moved nach oben
+            {
+                ghostposition.y--;
+            }
+            else
+            {
+                if (pacPosition.x < ghostposition.x) 
+                {
+                    if (canimove(was, pac.speed, ghostposition.x - 1, ghostposition.y, ghostposition.x - 1, ghostposition.y + ghostposition.h, &munzenzahler, apfel) == true) //moved nachlinks
+                    {
+                        ghostposition.x--;
+                    }
+
+                }
+                else 
+                {
+                    if (canimove(was, pac.speed, ghostposition.x + ghostposition.w + 1, ghostposition.y, ghostposition.x + ghostposition.w + 1, ghostposition.y + ghostposition.h, &munzenzahler, apfel) == true) 
+                    {
+                        ghostposition.x++;
+                    }
+                }        
+            }
+        }
+        if (pacPosition.y == ghostposition.y) 
+        {
+            if (pacPosition.x < ghostposition.x) 
+            {
+                if (canimove(was, pac.speed, ghostposition.x - 1, ghostposition.y, ghostposition.x - 1, ghostposition.y + ghostposition.h, &munzenzahler, apfel) == true) //moved nach links
+                {    
+                    ghostposition.x--;
+                }
+            }
+            else 
+            {
+                if (canimove(was, pac.speed, ghostposition.x + ghostposition.w + 1, ghostposition.y, ghostposition.x + ghostposition.w + 1, ghostposition.y + ghostposition.h, &munzenzahler, apfel) == true)
+                {
+                    ghostposition.x++;
+                }
+
+            }
+        }
+        if (pacPosition.y > ghostposition.y) 
+        {
+            if (canimove(was, pac.speed, ghostposition.x, ghostposition.y + ghostposition.h + 1, ghostposition.x + ghostposition.w, ghostposition.y + ghostposition.h + 1, &munzenzahler, apfel) == true) // moved nach unten
+            {    
+                ghostposition.y++;
+            }
+            else 
+            {
+                if (pacPosition.x < ghostposition.x) 
+                {
+                    if (canimove(was, pac.speed, ghostposition.x - 1, ghostposition.y, ghostposition.x - 1, ghostposition.y + ghostposition.h, &munzenzahler, apfel) == true) //moved nach links
+                    {
+                        ghostposition.x--;
+                    }  
+                }
+                else 
+                {
+                    if (canimove(was, pac.speed, ghostposition.x + ghostposition.w + 1, ghostposition.y, ghostposition.x + ghostposition.w + 1, ghostposition.y + ghostposition.h, &munzenzahler, apfel) == true) 
+                    {
+                        ghostposition.x++;
+                    }
+                }
+            }
+        }
+
+        SDL_RenderCopyEx(renderer, ghostTexture, NULL, &ghostposition, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
         SDL_RenderPresent(renderer);
 
+        
         //pac Animation
 
         //TODO --  enter a comand buffer to change directions in faster game. 
         //     --  Only alow direction change on valid paths (x,y)%50 = (5,5).
+
+        // a = validPathX(pacPosition.x);
+        // printf("\r%d, ", a);
+        // a = validPathY(pacPosition.y);
+        // printf("%d \n\r", a);
+
+        /*
         switch (pac.rotation)
         {
             case 0:                         //right (5)
                 x_pos += (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, background))
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, &munzenzahler, apfel) == true)
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -364,7 +597,7 @@ int main(void)
                 break;
             case 90:                        //down (5)
                 y_pos += (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, background))
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, &munzenzahler, apfel))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -375,7 +608,7 @@ int main(void)
                 break;
             case 180:                       //left (5)
                 x_pos -= (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x-BUMPER-5, pacPosition.y, pacPosition.x-BUMPER-5, pacPosition.y+pacPosition.h, background))
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x-BUMPER-5, pacPosition.y, pacPosition.x-BUMPER-5, pacPosition.y+pacPosition.h, &munzenzahler, apfel))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -386,7 +619,7 @@ int main(void)
                 break;
             case 270:                       //up (5)
                 y_pos -= (float) pac.speed;
-                if(canimove(19, 22, pacPosition.x, pacPosition.y-BUMPER-5, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER-5, background))
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x, pacPosition.y-BUMPER-5, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER-5, &munzenzahler, apfel))
                 {
                     pac.speed = PAC_SPEED/FPS_Cap;
                 }
@@ -399,11 +632,63 @@ int main(void)
             default:
                 break;
         }
-        a = validPathX(pacPosition.x);
-        printf("\r%d, ", a);
-        a = validPathY(pacPosition.y);
-        printf("%d \n\r", a);
+        */
 
+       switch (pac.rotation)
+        {
+            case 0:                         //right (3)
+                x_pos += (float) pac.speed;
+                *was = 3; 
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x+pacPosition.w+BUMPER, pacPosition.y, pacPosition.x +pacPosition.w +BUMPER, pacPosition.y+pacPosition.h, &munzenzahler, apfel) == true)
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            case 90:                        //down (2)
+                y_pos += (float) pac.speed;
+                *was = 2;
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x, pacPosition.y+pacPosition.h+BUMPER,pacPosition.x+pacPosition.w, pacPosition.y+pacPosition.h+BUMPER, &munzenzahler, apfel))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            case 180:                       //left (4)
+                x_pos -= (float) pac.speed;
+                *was = 4;
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x-BUMPER-5, pacPosition.y, pacPosition.x-BUMPER-5, pacPosition.y+pacPosition.h, &munzenzahler, apfel))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            case 270:                       //up (1)
+                y_pos -= (float) pac.speed;
+                *was = 1;
+                if(canimove(was, PAC_SPEED/FPS_Cap, pacPosition.x, pacPosition.y-BUMPER-5, pacPosition.x+pacPosition.w, pacPosition.y-BUMPER-5, &munzenzahler, apfel))
+                {
+                    pac.speed = PAC_SPEED/FPS_Cap;
+                }
+                else
+                {
+                    pac.speed = 0;
+                }
+                break;
+            
+            default:
+                break;
+        }
+        
         time(&end_t);
         diff_t = difftime(end_t, start_t);
         fpsDiff = 60 - diff_t;
@@ -412,13 +697,17 @@ int main(void)
         SDL_Delay(1000/fpsDiff);
     }
     
+    free(buffer);
+
     SDL_FreeSurface(image);
     SDL_FreeSurface(backSurface);
     SDL_FreeSurface(mapElements);
+    SDL_FreeSurface(loadedSurface);
 
     SDL_DestroyTexture(backTexture);
     SDL_DestroyTexture(pointTexture);
     SDL_DestroyTexture(pacEntity);
+    SDL_DestroyTexture(ghostTexture);
     
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
