@@ -45,6 +45,10 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* render = NULL;
     SDL_Texture* texi = NULL;
     SDL_Texture* ghostTexture = NULL;
+    SDL_Texture* ghost2Texture = NULL;
+    SDL_Texture* ghost3Texture = NULL;
+    SDL_Texture* ghost4Texture = NULL;
+    
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -65,6 +69,10 @@ int main(int argc, char* argv[]) {
             SDL_Surface* image = SDL_LoadBMP("pac.bmp");
             
             SDL_Surface* loadedSurface = SDL_LoadBMP("Ghost.bmp");
+            SDL_Surface* loadedSurface1 = SDL_LoadBMP("Ghost2.bmp");
+            SDL_Surface* loadedSurface2 = SDL_LoadBMP("Ghost3.bmp");
+            SDL_Surface* loadedSurface3 = SDL_LoadBMP("Ghost4.bmp");
+            
             
 
             render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -83,6 +91,45 @@ int main(int argc, char* argv[]) {
                 }
                 SDL_FreeSurface(loadedSurface);
             }
+            if (loadedSurface1 == NULL) {
+                printf("Unable to load the image!");
+
+            }
+            else
+            {
+                ghost2Texture = SDL_CreateTextureFromSurface(render, loadedSurface1);
+                if (ghost2Texture == NULL) {
+                    printf("Unable to create texture from Surface");
+
+                }
+                SDL_FreeSurface(loadedSurface1);
+            }
+            if (loadedSurface2 == NULL) {
+                printf("Unable to load the image!");
+
+            }
+            else
+            {
+                ghost3Texture = SDL_CreateTextureFromSurface(render, loadedSurface2);
+                if (ghost3Texture == NULL) {
+                    printf("Unable to create texture from Surface");
+
+                }
+                SDL_FreeSurface(loadedSurface2);
+            }
+            if (loadedSurface3 == NULL) {
+                printf("Unable to load the image!");
+
+            }
+            else
+            {
+                ghost4Texture = SDL_CreateTextureFromSurface(render, loadedSurface3);
+                if (ghost4Texture == NULL) {
+                    printf("Unable to create texture from Surface");
+
+                }
+                SDL_FreeSurface(loadedSurface3);
+            }
 
             //erstellt das viereck in dem pacman dargestellt wird
             SDL_Rect immageposition;
@@ -96,6 +143,24 @@ int main(int argc, char* argv[]) {
             ghostposition.y = 175;
             ghostposition.w = SHAPE_SIZE;
             ghostposition.h = SHAPE_SIZE;
+
+            SDL_Rect ghost2position;
+            ghost2position.x = 400;
+            ghost2position.y = 300;
+            ghost2position.w = SHAPE_SIZE;
+            ghost2position.h = SHAPE_SIZE;
+            
+            SDL_Rect ghost3position;
+            ghost3position.x = 10;
+            ghost3position.y = 50;
+            ghost3position.w = SHAPE_SIZE;
+            ghost3position.h = SHAPE_SIZE;
+
+            SDL_Rect ghost4position;
+            ghost4position.x = 350;
+            ghost4position.y = 200;
+            ghost4position.w = SHAPE_SIZE;
+            ghost4position.h = SHAPE_SIZE;
 
 
 
@@ -175,7 +240,7 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
-                //Geistbewegung
+                //Geistbewegung Geist 1
                 if (immageposition.y < ghostposition.y) {
                     if(canimove(19,22, ghostposition.x, ghostposition.y - 1, ghostposition.x + ghostposition.w, ghostposition.y - 1, background)== true)//moved nach oben
                         ghostposition.y--;
@@ -230,10 +295,178 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
+                //Geistbewegung Geist 2
+                if (immageposition.y < ghost2position.y) {
+                    if (canimove(19, 22, ghost2position.x, ghost2position.y - 1, ghost2position.x + ghost2position.w, ghost2position.y - 1, background) == true)//moved nach oben
+                        ghost2position.y--;
+                    else
+                    {
+                        if (immageposition.x < ghost2position.x) {
+                            if (canimove(19, 22, ghost2position.x - 1, ghost2position.y, ghost2position.x - 1, ghost2position.y + ghost2position.h, background) == true) {//moved nachlinks
+                                ghost2position.x--;
+                            }
+
+                        }
+                        else {
+                            if (canimove(19, 22, ghost2position.x + ghost2position.w + 1, ghost2position.y, ghost2position.x + ghost2position.w + 1, ghost2position.y + ghost2position.h, background) == true) {
+                                ghost2position.x++;
+                            }
+                        }
+
+
+
+                    }
+                }
+                if (immageposition.y == ghost2position.y) {
+                    if (immageposition.x < ghost2position.x) {
+                        if (canimove(19, 22, ghost2position.x - 1, ghost2position.y, ghost2position.x - 1, ghost2position.y + ghost2position.h, background) == true) {//moved nach links
+                            ghost2position.x--;
+                        }
+                    }
+                    else {
+                        if (canimove(19, 22, ghost2position.x + ghost2position.w + 1, ghost2position.y, ghost2position.x + ghost2position.w + 1, ghost2position.y + ghost2position.h, background) == true) {
+                            ghost2position.x++;
+
+                        }
+
+                    }
+                }
+                if (immageposition.y > ghost2position.y) {
+                    if (canimove(19, 22, ghost2position.x, ghost2position.y + ghost2position.h + 1, ghost2position.x + ghost2position.w, ghost2position.y + ghost2position.h + 1, background) == true) {// moved nach unten
+                        ghost2position.y++;
+                    }
+                    else {
+                        if (immageposition.x < ghost2position.x) {
+                            if (canimove(19, 22, ghost2position.x - 1, ghost2position.y, ghost2position.x - 1, ghost2position.y + ghost2position.h, background) == true) {//moved nach links
+                                ghost2position.x--;
+                            }
+
+
+                        }
+                        else {
+                            if (canimove(19, 22, ghost2position.x + ghost2position.w + 1, ghost2position.y, ghost2position.x + ghost2position.w + 1, ghost2position.y + ghost2position.h, background) == true) {
+                                ghost2position.x++;
+                            }
+                        }
+                    }
+                }
+                //Geistbewegung Geist 3
+                if (immageposition.y < ghost3position.y) {
+                    if (canimove(19, 22, ghost3position.x, ghost3position.y - 1, ghost3position.x + ghost3position.w, ghost3position.y - 1, background) == true)//moved nach oben
+                        ghost3position.y--;
+                    else
+                    {
+                        if (immageposition.x < ghost3position.x) {
+                            if (canimove(19, 22, ghost3position.x - 1, ghost3position.y, ghost3position.x - 1, ghost3position.y + ghost3position.h, background) == true) {//moved nachlinks
+                                ghost3position.x--;
+                            }
+
+                        }
+                        else {
+                            if (canimove(19, 22, ghost3position.x + ghost3position.w + 1, ghost3position.y, ghost3position.x + ghost3position.w + 1, ghost3position.y + ghost3position.h, background) == true) {
+                                ghost3position.x++;
+                            }
+                        }
+
+
+
+                    }
+                }
+                if (immageposition.y == ghost3position.y) {
+                    if (immageposition.x < ghost3position.x) {
+                        if (canimove(19, 22, ghost3position.x - 1, ghost3position.y, ghost3position.x - 1, ghost3position.y + ghost3position.h, background) == true) {//moved nach links
+                            ghost3position.x--;
+                        }
+                    }
+                    else {
+                        if (canimove(19, 22, ghost3position.x + ghost3position.w + 1, ghost3position.y, ghost3position.x + ghost3position.w + 1, ghost3position.y + ghost3position.h, background) == true) {
+                            ghost3position.x++;
+
+                        }
+
+                    }
+                }
+                if (immageposition.y > ghost3position.y) {
+                    if (canimove(19, 22, ghost3position.x, ghost3position.y + ghost3position.h + 1, ghost3position.x + ghost3position.w, ghost3position.y + ghost3position.h + 1, background) == true) {// moved nach unten
+                        ghost3position.y++;
+                    }
+                    else {
+                        if (immageposition.x < ghost3position.x) {
+                            if (canimove(19, 22, ghost3position.x - 1, ghost3position.y, ghost3position.x - 1, ghost3position.y + ghost3position.h, background) == true) {//moved nach links
+                                ghost3position.x--;
+                            }
+
+
+                        }
+                        else {
+                            if (canimove(19, 22, ghost3position.x + ghost3position.w + 1, ghost3position.y, ghost3position.x + ghost3position.w + 1, ghost3position.y + ghost3position.h, background) == true) {
+                                ghost3position.x++;
+                            }
+                        }
+                    }
+                }
+                //Geistbewegung Geist 4
+                if (immageposition.y < ghost4position.y) {
+                    if (canimove(19, 22, ghost4position.x, ghost4position.y - 1, ghost4position.x + ghost4position.w, ghost4position.y - 1, background) == true)//moved nach oben
+                        ghost4position.y--;
+                    else
+                    {
+                        if (immageposition.x < ghost4position.x) {
+                            if (canimove(19, 22, ghost4position.x - 1, ghost4position.y, ghost4position.x - 1, ghost4position.y + ghost4position.h, background) == true) {//moved nachlinks
+                                ghost4position.x--;
+                            }
+
+                        }
+                        else {
+                            if (canimove(19, 22, ghost4position.x + ghost4position.w + 1, ghost4position.y, ghost4position.x + ghost4position.w + 1, ghost4position.y + ghost4position.h, background) == true) {
+                                ghost4position.x++;
+                            }
+                        }
+
+
+
+                    }
+                }
+                if (immageposition.y == ghost4position.y) {
+                    if (immageposition.x < ghost4position.x) {
+                        if (canimove(19, 22, ghost4position.x - 1, ghost4position.y, ghost4position.x - 1, ghost4position.y + ghost4position.h, background) == true) {//moved nach links
+                            ghost4position.x--;
+                        }
+                    }
+                    else {
+                        if (canimove(19, 22, ghost4position.x + ghost4position.w + 1, ghost4position.y, ghost4position.x + ghost4position.w + 1, ghost4position.y + ghost4position.h, background) == true) {
+                            ghost4position.x++;
+
+                        }
+
+                    }
+                }
+                if (immageposition.y > ghost4position.y) {
+                    if (canimove(19, 22, ghost4position.x, ghost4position.y + ghost4position.h + 1, ghost4position.x + ghost4position.w, ghost4position.y + ghost4position.h + 1, background) == true) {// moved nach unten
+                        ghost4position.y++;
+                    }
+                    else {
+                        if (immageposition.x < ghost4position.x) {
+                            if (canimove(19, 22, ghost4position.x - 1, ghost4position.y, ghost4position.x - 1, ghost4position.y + ghost4position.h, background) == true) {//moved nach links
+                                ghost4position.x--;
+                            }
+
+
+                        }
+                        else {
+                            if (canimove(19, 22, ghost4position.x + ghost4position.w + 1, ghost4position.y, ghost4position.x + ghost4position.w + 1, ghost4position.y + ghost4position.h, background) == true) {
+                                ghost4position.x++;
+                            }
+                        }
+                    }
+                }
 
                 //läd pacman ins fenster und repräsentiert alles
                 SDL_RenderCopyEx(render, texi, NULL, &immageposition, rotation, NULL, SDL_FLIP_NONE);
                 SDL_RenderCopyEx(render, ghostTexture, NULL, &ghostposition, 0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(render, ghost2Texture, NULL, &ghost2position, 0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(render, ghost3Texture, NULL, &ghost3position, 0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(render, ghost4Texture, NULL, &ghost4position, 0, NULL, SDL_FLIP_NONE);
                 SDL_RenderPresent(render);
 
             }
