@@ -5,12 +5,6 @@
 
 CC = gcc
 CFLAGS = `sdl2-config --libs --cflags -lSDL2 -lSDLImage2` -ggdb3 -O0 --std=c99 -Wall -lSDL2_image -lm 
-#CFLAGS = -std=c99 -pedantic -Wall -Wextra -lm
-#SDLFLAG = `sdl2-config --cflags --libs `
-OUT = PAC-entity.out
-EXE = PAC-entity.out
-
-
 
 PAC-entity.exe:
 
