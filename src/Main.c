@@ -24,25 +24,29 @@
 #include "background.h"
 #include "function.h"
 
-void randApple(int frame)
+void randApple(int frame, int *ranX, int *ranY)
 {
     srand(time(NULL));
-    int ranX = rand() % 19;
-    int ranY = rand() % 22;
+    int X = rand() % 19;
+    int Y = rand() % 22;
+
     if(frame % 500 == 0)
     {
         for(int i = 0; i <= 1;)
         {
-            printf("%d, %d\n", ranX, ranY);
-            if(backgroundCheck[ranY][ranX] == 1)
+            printf("%d, %d\n", X, Y);
+            if(backgroundCheck[Y][X] == 1)
             {
-                background[ranY][ranX] = 22;
+                background[*ranY][*ranX] = 0;
+                background[Y][X] = 22;
+                ranX = &X;
+                ranY = &Y;
                 i++;
             }
             else
             {
-                ranX = rand() % 19;
-                ranY = rand() % 22;
+                X = rand() % 19;
+                Y = rand() % 22;
             }
         }
     }
@@ -54,14 +58,11 @@ int main(void)
     double diff_t;
     int fpsDiff;
     int frame = 1;
+    int ranX = 9;
+    int ranY = 12;
 
     int *was, o;
     was=&o;
-
-    char *start = "hello";
-    char *end = start + 5;
-    printf("\nstart = %s\nend = %s\n", start, end);
-    printf("final = %s\n", ((end - start) / 2) + start);
 
     //Leben = Äpfel
     int apfel=1;
@@ -327,7 +328,7 @@ int main(void)
         pacPosition.y = (int) y_pos;
         pacPosition.x = (int) x_pos;
 
-        randApple(frame);
+        randApple(frame, &ranX, &ranY);
 
         SDL_RenderCopy(renderer, backTexture, NULL, NULL);
         for(int i = 0; i < 22; i++)
