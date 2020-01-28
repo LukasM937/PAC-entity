@@ -24,206 +24,44 @@
 #include "background.h"
 #include "function.h"
 
-/*
-typedef struct player
+void randApple(int frame)
 {
-    int x;
-    int y;
-    int rotation;
-    int speed;
-} player;
-
-int validPathX (int x)
-{
-    int a;
-    a = x % 50;
-
-    return a;
-}
-int validPathY (int y)
-{
-    int a;
-    a = y % 50;
-
-    return a;
-}
-
-bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *munzenzahler, int *apfel)
-{
-    int buf = *was;
-    int pufferx, puffery, pufferx1, puffery1;
-    for(int i = 1; i <= speed; i++)
+    srand(time(NULL));
+    int ranX = rand() % 19;
+    int ranY = rand() % 22;
+    if(frame % 500 == 0)
     {
-        if(buf == 0)
+        for(int i = 0; i <= 1;)
         {
-            return false;
-        }
-        if(buf==1)
-        {
-            pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/ARX));
-            puffery = (int)((double)(poy-i)/(double)(SCREEN_HEIGHT/ARY));
-
-            pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
-            puffery1 = (int)((double)(poy1-i)/(double)(SCREEN_HEIGHT/ARY));
-        }
-        else if(buf==2)
-        {
-            pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/ARX));
-            puffery = (int)((double)(poy+i)/(double)(SCREEN_HEIGHT/ARY));
-
-            pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
-            puffery1 = (int)((double)(poy1+i)/(double)(SCREEN_HEIGHT/ARY));
-        }
-        else if(buf==3)
-        {
-            pufferx = (int)((double)(pox+i)/(double)(SCREEN_WIDTH/ARX));
-            puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ARY));
-
-            pufferx1 = (int)((double)(pox1+i)/(double)(SCREEN_WIDTH/ARX));
-            puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
-        }
-        else if(buf==4)
-        {
-            pufferx = (int)((double)(pox-i)/(double)(SCREEN_WIDTH/ARX));
-            puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ARY));
-
-            pufferx1 = (int)((double)(pox1-i)/(double)(SCREEN_WIDTH/ARX));
-            puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
-        }
-
-        if((background[puffery][pufferx]==0 || background[puffery][pufferx]==1 || background[puffery][pufferx]==22) && (background[puffery1] [pufferx1] == 0 || background[puffery1] [pufferx1] == 1 || background[puffery1][pufferx1]==22))
-        {
-            *was=i;
-
-            if(background[puffery][pufferx]==22)
+            printf("%d, %d\n", ranX, ranY);
+            if(backgroundCheck[ranY][ranX] == 1)
             {
-                *apfel=*apfel+1;
-                background[puffery][pufferx]=0;
+                background[ranY][ranX] = 22;
+                i++;
             }
-            else if(background[puffery1][pufferx1]==22)
+            else
             {
-                *apfel=*apfel+1;
-                background[puffery][pufferx]=0;
-            }
-            if(background[puffery][pufferx]==1)
-            {
-                *munzenzahler=*munzenzahler+1;
-                background[puffery][pufferx]=0;
-            }
-            else if(background[puffery1][pufferx1]==1)
-            {
-                *munzenzahler=*munzenzahler+1;
-                background[puffery1][pufferx1]=0;
-            }
-        }
-        else if (i==1)
-        {
-            return false;
-        }
-        else return true;
-    }
-    return true;
-}
-
-bool canimove (int pox, int poy, int pox1, int poy1)
-{
-    int pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/ARX));
-    int puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ARY));
-
-    int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
-    int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
-
-    if(background[puffery][pufferx]==0 || (background[puffery][pufferx]==1 && background[puffery1][pufferx1] == 0) || background[puffery1][pufferx1] == 1)
-    {
-        return true;
-    }
-    else 
-    {
-        return false;
-    }
-}
-
-void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
-{
-    if (pac->y < ghost->y) 
-    {
-        if(canimove(ghost->x, ghost->y - BUMPER, ghost->x + ghost->w, ghost->y - BUMPER) == true)//moved nach oben
-            {
-                ghost->y -= ghostStuff->speed;
-            }
-        else
-        {
-            if (pac->x < ghost->x) 
-            {
-                if (canimove(ghost->x - BUMPER, ghost->y, ghost->x - BUMPER, ghost->y + ghost->h) == true) //moved nachlinks
-                {
-                    ghost->x -= ghostStuff->speed;
-                }
-
-            }
-            else 
-            {
-                if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == true)
-                {
-                    ghost->x += ghostStuff->speed;
-                }
-            }   
-        }
-    }
-    if (pac->y == ghost->y) 
-    {
-        if (pac->x < ghost->x) 
-        {
-            if (canimove(ghost->x - BUMPER, ghost->y, ghost->x - BUMPER, ghost->y + ghost->h) == true) //moved nach links
-            {
-                ghost->x -= ghostStuff->speed;
-            }
-        }
-        else 
-        {
-            if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == true) 
-            {
-                ghost->x += ghostStuff->speed;
-            }
-        }
-    }
-    if (pac->y > ghost->y) 
-    {
-        if (canimove(ghost->x, ghost->y + ghost->h + BUMPER, ghost->x + ghost->w, ghost->y + ghost->h + BUMPER) == true) // moved nach unten
-        {
-            ghost->y += ghostStuff->speed;
-        }
-        else 
-        {
-            if (pac->x < ghost->x) 
-            {
-                if (canimove(ghost->x - BUMPER, ghost->y, ghost->x - BUMPER, ghost->y + ghost->h) == true) //moved nach links
-                {
-                    ghost->x -= ghostStuff->speed;
-                }
-                
-                
-            }
-            else 
-            {
-                if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == true) 
-                {
-                    ghost->x += ghostStuff->speed;
-                }
+                ranX = rand() % 19;
+                ranY = rand() % 22;
             }
         }
     }
 }
-*/
 
 int main(void)
 {
     time_t start_t, end_t;
     double diff_t;
     int fpsDiff;
+    int frame = 1;
 
     int *was, o;
     was=&o;
+
+    char *start = "hello";
+    char *end = start + 5;
+    printf("\nstart = %s\nend = %s\n", start, end);
+    printf("final = %s\n", ((end - start) / 2) + start);
 
     //Leben = Äpfel
     int apfel=1;
@@ -488,7 +326,9 @@ int main(void)
         //lÃ¤d pacman ins fenster und reprÃ¤sentiert alles
         pacPosition.y = (int) y_pos;
         pacPosition.x = (int) x_pos;
-        
+
+        randApple(frame);
+
         SDL_RenderCopy(renderer, backTexture, NULL, NULL);
         for(int i = 0; i < 22; i++)
         {
@@ -503,9 +343,15 @@ int main(void)
                     sourceRect.y = 200;
                     SDL_RenderCopy(renderer, pointTexture, &sourceRect, &targetRect);
                 }
+                if(background[i][j] == 22)
+                {
+                    sourceRect.x = 200;
+                    sourceRect.y = 50;
+                    SDL_RenderCopy(renderer, pointTexture, &sourceRect, &targetRect);
+                }
             }
         }
-
+        frame++;
         //Geistbewegung Geist 1
         ghostMove(&pacPosition, &redPosition, &redG);
         //Geistbewegung Geist 2

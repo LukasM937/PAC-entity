@@ -107,7 +107,7 @@ bool canimove (int pox, int poy, int pox1, int poy1)
     int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
     int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
 
-    if(background[puffery][pufferx]==0 || (background[puffery][pufferx]==1 && background[puffery1][pufferx1] == 0) || background[puffery1][pufferx1] == 1)
+    if((background[puffery][pufferx]==0 || background[puffery][pufferx]==1 || background[puffery][pufferx]==22) && (background[puffery1][pufferx1] == 0 || background[puffery1][pufferx1] == 1|| background[puffery][pufferx]==22))
     {
         return true;
     }
