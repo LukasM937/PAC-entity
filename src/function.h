@@ -5,22 +5,10 @@ typedef struct player
     int y;
     int rotation;
     int speed;
+    int targetX;
+    int targetY;
+    int ghostType;
 } player;
-
-int validPathX (int x)
-{
-    int a;
-    a = x % 50;
-
-    return a;
-}
-int validPathY (int y)
-{
-    int a;
-    a = y % 50;
-
-    return a;
-}
 
 bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *munzenzahler, int *apfel)
 {
@@ -117,9 +105,68 @@ bool canimove (int pox, int poy, int pox1, int poy1)
     }
 }
 
-void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
+void setTarget(player *ghostStuff, player *pacStuff)
 {
-    if (pac->y < ghost->y) 
+    switch (ghostStuff->ghostType)
+    {
+    case 1:
+        ghostStuff->targetX = pacStuff->x;
+        ghostStuff->targetY = pacStuff->y;
+        break;
+    case 2:
+        switch (pacStuff->rotation)
+        {
+        case 0: //right
+            ghostStuff->targetX = pacStuff->x + 100;
+            ghostStuff->targetY = pacStuff->y;
+            break;
+        case 90: //down
+            ghostStuff->targetX = pacStuff->x;
+            ghostStuff->targetY = pacStuff->y + 100;
+            break;
+        case 180: //left
+            ghostStuff->targetX = pacStuff->x - 100;
+            ghostStuff->targetY = pacStuff->y;
+            break;
+        case 270: //up
+            ghostStuff->targetX = pacStuff->x;
+            ghostStuff->targetY = pacStuff->y - 100;
+            break;
+        
+        default:
+            break;
+        }
+        break;
+    case 3:
+        ghostStuff->targetX = abs(pacStuff->x - ghostStuff->targetX) + pacStuff->x; //gS->tx = red X , gS->x = cyan x
+        ghostStuff->targetY = abs(pacStuff->y - ghostStuff->targetY) + pacStuff->y;
+        break;
+    case 4:
+        if((abs(pacStuff->x - ghostStuff->x) + abs(pacStuff->x - ghostStuff->x)) <= 400)
+        {
+            ghostStuff->targetX = 450;
+            ghostStuff->targetY = 800;
+        }
+        else
+        {
+            ghostStuff->targetX = pacStuff->x;
+            ghostStuff->targetY = pacStuff->y;
+        }
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacStuff)
+{
+    pacStuff->x = pac->x;
+    pacStuff->y = pac->y;
+
+    setTarget(ghostStuff, pacStuff);
+
+    if (ghostStuff->targetY < ghost->y) 
     {
         if(canimove(ghost->x, ghost->y - BUMPER, ghost->x + ghost->w, ghost->y - BUMPER) == true)//moved nach oben
             {
@@ -127,7 +174,7 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
             }
         else
         {
-            if (pac->x < ghost->x) 
+            if (ghostStuff->targetX < ghost->x) 
             {
                 if (canimove(ghost->x - BUMPER, ghost->y, ghost->x - BUMPER, ghost->y + ghost->h) == true) //moved nachlinks
                 {
@@ -144,9 +191,9 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
             }   
         }
     }
-    if (pac->y == ghost->y) 
+    if (ghostStuff->targetY == ghost->y) 
     {
-        if (pac->x < ghost->x) 
+        if (ghostStuff->targetX < ghost->x) 
         {
             if (canimove(ghost->x - BUMPER, ghost->y, ghost->x - BUMPER, ghost->y + ghost->h) == true) //moved nach links
             {
@@ -161,7 +208,7 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
             }
         }
     }
-    if (pac->y > ghost->y) 
+    if (ghostStuff->targetY > ghost->y) 
     {
         if (canimove(ghost->x, ghost->y + ghost->h + BUMPER, ghost->x + ghost->w, ghost->y + ghost->h + BUMPER) == true) // moved nach unten
         {
@@ -169,7 +216,7 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
         }
         else 
         {
-            if (pac->x < ghost->x) 
+            if (ghostStuff->targetX < ghost->x) 
             {
                 if (canimove(ghost->x - BUMPER, ghost->y, ghost->x - BUMPER, ghost->y + ghost->h) == true) //moved nach links
                 {
@@ -187,4 +234,65 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff)
             }
         }
     }
+}
+
+void randApple(int frame, int *ranX, int *ranY)
+{
+    srand(time(NULL));
+    int X = rand() % 19;
+    int Y = rand() % 22;
+
+    if(frame % 500 == 0)
+    {
+        for(int i = 0; i <= 1;)
+        {
+            // printf("%d, %d\n", X, Y);
+            if(backgroundCheck[Y][X] == 1)
+            {
+                background[*ranY][*ranX] = 0;
+                background[Y][X] = 22;
+                ranX = &X;
+                ranY = &Y;
+                i++;
+            }
+            else
+            {
+                X = rand() % 19;
+                Y = rand() % 22;
+            }
+        }
+    }
+}
+
+int collision(SDL_Rect *pac, SDL_Rect *red, SDL_Rect *pink, SDL_Rect *cyan, SDL_Rect *brown, int *apfel)
+{
+    if(abs(pac->x - red->x) <= BUMPER)
+    {
+        if(abs(pac->y - red->y) <= BUMPER)
+        {
+            return 0;
+        }
+    }
+    if(abs(pac->x - pink->x) <= BUMPER)
+    {
+        if(abs(pac->y - pink->y) <= BUMPER)
+        {
+            return 0;
+        }
+    }
+    if(abs(pac->x - cyan->x) <= BUMPER)
+    {
+        if(abs(pac->y - cyan->y) <= BUMPER)
+        {
+            return 0;
+        }
+    }
+    if(abs(pac->x - brown->x) <= BUMPER)
+    {
+        if(abs(pac->y - brown->y) <= BUMPER)
+        {
+            return 0;
+        }
+    }
+    return 1;
 }
