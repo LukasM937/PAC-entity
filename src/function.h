@@ -103,7 +103,7 @@ bool canimove (int pox, int poy, int pox1, int poy1)
     }
 }
 
-void setTarget(player *ghostStuff, player *pacStuff)
+void setTarget(player *ghostStuff, player *pacStuff, int *frameCounter)
 {
     switch (ghostStuff->ghostType)
     {
@@ -140,10 +140,19 @@ void setTarget(player *ghostStuff, player *pacStuff)
         ghostStuff->targetY = abs(pacStuff->y - ghostStuff->targetY) + pacStuff->y;
         break;
     case 4:
-        if((abs(pacStuff->x - ghostStuff->x) + abs(pacStuff->x - ghostStuff->x)) <= 400)
+        if((abs(pacStuff->x - ghostStuff->x) + abs(pacStuff->y - ghostStuff->y)) <= 400)
         {
-            ghostStuff->targetX = 450;
-            ghostStuff->targetY = 800;
+            frameCounter = 1;
+            if(frameCounter != 0)
+            {
+                ghostStuff->targetX = 450;
+                ghostStuff->targetY = 800;
+            }
+            if(ghostStuff->x == ghostStuff->targetX)
+            {
+                if(ghostStuff->y == ghostStuff->targetY)
+                {frameCounter = 0;}
+            }
         }
         else
         {
@@ -157,12 +166,68 @@ void setTarget(player *ghostStuff, player *pacStuff)
     }
 }
 
-void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacStuff)
+void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacStuff, int *frameCounter)
 {
     pacStuff->x = pac->x;
     pacStuff->y = pac->y;
 
-    setTarget(ghostStuff, pacStuff);
+    setTarget(ghostStuff, pacStuff, frameCounter);
+
+    int collision = 0;
+    if (collision > 0)
+    {
+        switch (collision)
+        {
+        case 1:
+            if (canimove(ghost->x, ghost->y - BUMPER, ghost->x + ghost->w, ghost->y - BUMPER) == false)
+            {
+                ghost->x += ghostStuff->speed;
+            }
+            else
+            {
+                ghost->y -= ghostStuff->speed;
+                collision = 0;
+            }
+            break;
+        case 2:
+            if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == false)
+            {
+                ghost->y += ghostStuff->speed;
+            }
+            else
+            {
+
+                ghost->x += ghostStuff->speed;
+                collision = 0;
+            }
+            break;
+        case 3:
+            if (canimove(ghost->x, ghost->y + ghost->h + BUMPER, ghost->x + ghost->w, ghost->y + ghost->h + BUMPER) == false)
+            {
+
+                ghost->x += ghostStuff->speed;
+            }
+            else
+            {
+                ghost->y += ghostStuff->speed;
+                collision = 0;
+
+            }
+            break;
+        case 4:
+            if (canimove(ghost->x, ghost->y + ghost->h + BUMPER, ghost->x + ghost->w, ghost->y + ghost->h + BUMPER) == false)
+            {
+                ghost->x -= ghostStuff->speed;
+            }
+            else
+            {
+                ghost->y += ghostStuff->speed;
+                collision = 0;
+            }
+            break;
+        }
+
+    }
 
     if (ghostStuff->targetY < ghost->y) 
     {
@@ -178,6 +243,10 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 {
                     ghost->x -= ghostStuff->speed;
                 }
+                else
+                {
+                    collision = 1;
+                }
 
             }
             else 
@@ -185,6 +254,10 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == true)
                 {
                     ghost->x += ghostStuff->speed;
+                }
+                else
+                {
+                    collision = 2;
                 }
             }   
         }
@@ -220,14 +293,20 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 {
                     ghost->x -= ghostStuff->speed;
                 }
-                
-                
+                else
+                {
+                    collision = 3;
+                }
             }
             else 
             {
                 if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == true) 
                 {
                     ghost->x += ghostStuff->speed;
+                }
+                else
+                {
+                    collision = 4;
                 }
             }
         }

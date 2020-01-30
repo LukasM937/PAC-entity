@@ -30,6 +30,7 @@ int main(void)
     double diff_t;
     int fpsDiff;
     int frame = 1;
+    int frameCounter = 1;
     int ranX = 9;
     int ranY = 12;
 
@@ -353,15 +354,18 @@ int main(void)
         cyanG.y = cyanPosition.y;
         cyanG.targetX = redPosition.x;
         cyanG.targetY = redPosition.y;
+
+        brownG.x = brownPosition.x;
+        brownG.y = brownPosition.y;
         
         //Geistbewegung Geist 1
-        ghostMove(&pacPosition, &redPosition, &redG, &pac);
+        ghostMove(&pacPosition, &redPosition, &redG, &pac, &frameCounter);
         //Geistbewegung Geist 2
-        ghostMove(&pacPosition, &pinkPosition, &pinkG, &pac);
+        ghostMove(&pacPosition, &pinkPosition, &pinkG, &pac, &frameCounter);
         //Geistbewegung Geist 3
-        ghostMove(&pacPosition, &cyanPosition, &cyanG, &pac);
+        ghostMove(&pacPosition, &cyanPosition, &cyanG, &pac, &frameCounter);
         //Geistbewegung Geist 4
-        ghostMove(&pacPosition, &brownPosition, &cyanG, &pac);
+        ghostMove(&pacPosition, &brownPosition, &brownG, &pac, &frameCounter);
         //SDL_RenderDrawPoint(renderer, brownG.targetX, brownG.targetY);
 
         SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
@@ -427,7 +431,7 @@ int main(void)
                 break;
         }
 
-        printf("Muenzen: %d Apfel: %d\r", munzenzahler, apfel);
+        //printf("Muenzen: %d Apfel: %d\r", munzenzahler, apfel);
         frame++;
 
         time(&end_t);
