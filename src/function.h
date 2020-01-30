@@ -16,11 +16,7 @@ bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *
     int pufferx, puffery, pufferx1, puffery1;
     for(int i = 1; i <= speed; i++)
     {
-        if(buf == 0)
-        {
-            return false;
-        }
-        if(buf==1)
+        if(buf == 1)
         {
             pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/ARX));
             puffery = (int)((double)(poy-i)/(double)(SCREEN_HEIGHT/ARY));
@@ -28,7 +24,7 @@ bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *
             pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
             puffery1 = (int)((double)(poy1-i)/(double)(SCREEN_HEIGHT/ARY));
         }
-        else if(buf==2)
+        else if(buf == 2)
         {
             pufferx = (int)((double)pox/(double)(SCREEN_WIDTH/ARX));
             puffery = (int)((double)(poy+i)/(double)(SCREEN_HEIGHT/ARY));
@@ -36,7 +32,7 @@ bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *
             pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
             puffery1 = (int)((double)(poy1+i)/(double)(SCREEN_HEIGHT/ARY));
         }
-        else if(buf==3)
+        else if(buf == 3)
         {
             pufferx = (int)((double)(pox+i)/(double)(SCREEN_WIDTH/ARX));
             puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ARY));
@@ -44,7 +40,7 @@ bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *
             pufferx1 = (int)((double)(pox1+i)/(double)(SCREEN_WIDTH/ARX));
             puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
         }
-        else if(buf==4)
+        else if(buf == 4)
         {
             pufferx = (int)((double)(pox-i)/(double)(SCREEN_WIDTH/ARX));
             puffery = (int)((double)poy/(double)(SCREEN_HEIGHT/ARY));
@@ -53,32 +49,34 @@ bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *
             puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
         }
 
-        if((background[puffery][pufferx]==0 || background[puffery][pufferx]==1 || background[puffery][pufferx]==22) && (background[puffery1] [pufferx1] == 0 || background[puffery1] [pufferx1] == 1 || background[puffery1][pufferx1]==22))
+        if((background[puffery][pufferx] == 0 || background[puffery][pufferx] == 1 || background[puffery][pufferx] == 22) && (background[puffery1] [pufferx1] == 0 || background[puffery1] [pufferx1] == 1 || background[puffery1][pufferx1] == 22))
         {
-            *was=i;
+            *was = i;
 
-            if(background[puffery][pufferx]==22)
+            if(background[puffery][pufferx] == 22)
             {
                 *apfel=*apfel+1;
-                background[puffery][pufferx]=0;
+                background[puffery][pufferx] = 0;
             }
-            else if(background[puffery1][pufferx1]==22)
+            else if(background[puffery1][pufferx1] == 22)
             {
                 *apfel=*apfel+1;
-                background[puffery][pufferx]=0;
+                background[puffery][pufferx] = 0;
             }
-            if(background[puffery][pufferx]==1)
+            if(background[puffery][pufferx] == 1)
             {
-                *munzenzahler=*munzenzahler+1;
-                background[puffery][pufferx]=0;
+                *munzenzahler=*munzenzahler + 1;
+                background[puffery][pufferx] = 0;
+                backgroundCheck[puffery][pufferx] = 0;
             }
-            else if(background[puffery1][pufferx1]==1)
+            else if(background[puffery1][pufferx1] == 1)
             {
-                *munzenzahler=*munzenzahler+1;
-                background[puffery1][pufferx1]=0;
+                *munzenzahler =*munzenzahler + 1;
+                background[puffery1][pufferx1] = 0;
+                backgroundCheck[puffery][pufferx] = 0;
             }
         }
-        else if (i==1)
+        else if (i == 1)
         {
             return false;
         }
@@ -95,7 +93,7 @@ bool canimove (int pox, int poy, int pox1, int poy1)
     int pufferx1 = (int)((double)pox1/(double)(SCREEN_WIDTH/ARX));
     int puffery1 = (int)((double)poy1/(double)(SCREEN_HEIGHT/ARY));
 
-    if((background[puffery][pufferx]==0 || background[puffery][pufferx]==1 || background[puffery][pufferx]==22) && (background[puffery1][pufferx1] == 0 || background[puffery1][pufferx1] == 1|| background[puffery][pufferx]==22))
+    if((background[puffery][pufferx] == 0 || background[puffery][pufferx] == 1 || background[puffery][pufferx] == 22) && (background[puffery1][pufferx1] == 0 || background[puffery1][pufferx1] == 1|| background[puffery][pufferx] == 22))
     {
         return true;
     }
@@ -242,17 +240,26 @@ void randApple(int frame, int *ranX, int *ranY)
     int X = rand() % 19;
     int Y = rand() % 22;
 
-    if(frame % 500 == 0)
+    if(frame % 1000 == 0)
     {
+        
         for(int i = 0; i <= 1;)
         {
             // printf("%d, %d\n", X, Y);
             if(backgroundCheck[Y][X] == 1)
             {
+                background[*ranY][*ranX] = 1;
+                background[Y][X] = 22;
+                *ranX = X;
+                *ranY = Y;
+                i++;
+            }
+            else if(backgroundCheck[Y][X] == 0)
+            {
                 background[*ranY][*ranX] = 0;
                 background[Y][X] = 22;
-                ranX = &X;
-                ranY = &Y;
+                *ranX = X;
+                *ranY = Y;
                 i++;
             }
             else
@@ -295,4 +302,21 @@ int collision(SDL_Rect *pac, SDL_Rect *red, SDL_Rect *pink, SDL_Rect *cyan, SDL_
         }
     }
     return 1;
+}
+
+int checkForZeros()
+{
+    int counter = 0;
+    for(int i = 0; i < ARX; i++)
+    {
+        for(int j = 0; j < ARY; j++)
+        {
+            if(background[j][i] == 1)
+            {
+                counter++; 
+            }
+        }
+    }
+    if(counter == 0) return 0;
+    else return 1;
 }

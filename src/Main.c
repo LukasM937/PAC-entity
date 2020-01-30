@@ -24,7 +24,6 @@
 #include "background.h"
 #include "function.h"
 
-
 int main(void)
 {
     time_t start_t, end_t;
@@ -40,7 +39,7 @@ int main(void)
     //Leben = Äpfel
     int apfel = 1;
 
-    //zählt die münzen hoch
+    //zählt die münzen hoch         anzahl Münzen 190
     int munzenzahler = 0;
 
     //structs für Pac-Ding und geister. Geister sind unterschiedlich um unterschiedliche ziele leichter zu realisieren.
@@ -245,6 +244,7 @@ int main(void)
             {
                 case SDL_QUIT:
                     running = false;
+                    goto ENDE;
                     break;
                 /* Look for a keypress */
                 case SDL_KEYDOWN:
@@ -287,19 +287,38 @@ int main(void)
                             // buffer[0] = SDLK_LEFT;
                         } 
                         break;
+                    case SDLK_r:
+                        x_pos = (float) PAC_START_X;
+                        y_pos = (float) PAC_START_Y;
+                        pac.rotation = 0;
+                        
+                        break;
                     case SDLK_ESCAPE:
                         running = false;
+                        goto ENDE;
                         break;
                     default:
                         break;
                 }
             }
         }
+
         if(collision(&pacPosition, &redPosition, &pinkPosition, &cyanPosition, &brownPosition, &apfel) == 0)
         {
             apfel--;
         }
-        if(apfel <= 0) running = false;
+        if(apfel <= 0)
+        {
+            running = false;
+            printf("\n\n\tGame Over, you loose\n\n");
+            goto ENDE;
+        }
+        if(checkForZeros() == 0)
+        {
+            running = false;
+            printf("\n\n\t! Win !\n\n");
+            goto ENDE;
+        }
 
         //lädt pacman ins fenster und reprÃ¤sentiert alles
         pacPosition.y = (int) y_pos;
@@ -419,6 +438,8 @@ int main(void)
         SDL_Delay(1000/fpsDiff);
     }
     
+    ENDE:
+
     SDL_FreeSurface(image);
     SDL_FreeSurface(backSurface);
     SDL_FreeSurface(mapElements);
