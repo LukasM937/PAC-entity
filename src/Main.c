@@ -24,50 +24,23 @@
 #include "background.h"
 #include "function.h"
 
-void randApple(int frame)
-{
-    srand(time(NULL));
-    int ranX = rand() % 19;
-    int ranY = rand() % 22;
-    if(frame % 500 == 0)
-    {
-        for(int i = 0; i <= 1;)
-        {
-            printf("%d, %d\n", ranX, ranY);
-            if(backgroundCheck[ranY][ranX] == 1)
-            {
-                background[ranY][ranX] = 22;
-                i++;
-            }
-            else
-            {
-                ranX = rand() % 19;
-                ranY = rand() % 22;
-            }
-        }
-    }
-}
-
 int main(void)
 {
     time_t start_t, end_t;
     double diff_t;
     int fpsDiff;
     int frame = 1;
+    int ranX = 9;
+    int ranY = 12;
 
     int *was, o;
     was=&o;
 
-    char *start = "hello";
-    char *end = start + 5;
-    printf("\nstart = %s\nend = %s\n", start, end);
-    printf("final = %s\n", ((end - start) / 2) + start);
-
     //Leben = Äpfel
-    int apfel=1;
+    int apfel = 1;
 
-    //zählt die münzen hoch
-    int munzenzahler=0;
+    //zählt die münzen hoch         anzahl Münzen 190
+    int munzenzahler = 0;
 
     //structs für Pac-Ding und geister. Geister sind unterschiedlich um unterschiedliche ziele leichter zu realisieren.
     player pac;
@@ -82,6 +55,11 @@ int main(void)
     pinkG.rotation = 0;
     cyanG.rotation = 0;
     brownG.rotation = 0;
+
+    redG.ghostType = 1;
+    pinkG.ghostType = 2;
+    cyanG.ghostType = 3;
+    brownG.ghostType = 4;
 
     SDL_Texture* ghostRedTex = NULL;
     SDL_Texture* ghostPinkTex = NULL;
@@ -98,13 +76,13 @@ int main(void)
     sourceRect.h = blockSize;
 
     //Bewegungs Buffer
-    SDL_Keycode *buffer;
+    // SDL_Keycode *buffer;
 
-    buffer = malloc(BUFFER_LENGTH * sizeof(SDL_Keycode));
-    for(int k = 0; k < BUFFER_LENGTH; k++)
-    {
-        buffer[k] = 0;
-    }
+    // buffer = malloc(BUFFER_LENGTH * sizeof(SDL_Keycode));
+    // for(int k = 0; k < BUFFER_LENGTH; k++)
+    // {
+    //     buffer[k] = 0;
+    // }
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -260,19 +238,13 @@ int main(void)
         time(&start_t);
         SDL_RenderClear(renderer);
         
-        //Shift the Buffer
-        for(int i = BUFFER_LENGTH - 1; i >= 0; i--)
-        {
-            buffer[i+1] = buffer[i];
-        }
-        buffer[0] = 0;
-
         while (SDL_PollEvent(&event))
         {
             switch(event.type)
             {
                 case SDL_QUIT:
                     running = false;
+                    goto ENDE;
                     break;
                 /* Look for a keypress */
                 case SDL_KEYDOWN:
@@ -315,19 +287,44 @@ int main(void)
                             // buffer[0] = SDLK_LEFT;
                         } 
                         break;
+                    case SDLK_r:
+                        x_pos = (float) PAC_START_X;
+                        y_pos = (float) PAC_START_Y;
+                        pac.rotation = 0;
+                        
+                        break;
                     case SDLK_ESCAPE:
                         running = false;
+                        goto ENDE;
                         break;
                     default:
                         break;
                 }
             }
         }
-        //lÃ¤d pacman ins fenster und reprÃ¤sentiert alles
+
+        if(collision(&pacPosition, &redPosition, &pinkPosition, &cyanPosition, &brownPosition, &apfel) == 0)
+        {
+            apfel--;
+        }
+        if(apfel <= 0)
+        {
+            running = false;
+            printf("\n\n\tGame Over, you loose\n\n");
+            goto ENDE;
+        }
+        if(checkForZeros() == 0)
+        {
+            running = false;
+            printf("\n\n\t! Win !\n\n");
+            goto ENDE;
+        }
+
+        //lädt pacman ins fenster und reprÃ¤sentiert alles
         pacPosition.y = (int) y_pos;
         pacPosition.x = (int) x_pos;
 
-        randApple(frame);
+        randApple(frame, &ranX, &ranY);
 
         SDL_RenderCopy(renderer, backTexture, NULL, NULL);
         for(int i = 0; i < 22; i++)
@@ -351,15 +348,21 @@ int main(void)
                 }
             }
         }
-        frame++;
+
+        cyanG.x = cyanPosition.x;
+        cyanG.y = cyanPosition.y;
+        cyanG.targetX = redPosition.x;
+        cyanG.targetY = redPosition.y;
+        
         //Geistbewegung Geist 1
-        ghostMove(&pacPosition, &redPosition, &redG);
+        ghostMove(&pacPosition, &redPosition, &redG, &pac);
         //Geistbewegung Geist 2
-        ghostMove(&pacPosition, &pinkPosition, &pinkG);
+        ghostMove(&pacPosition, &pinkPosition, &pinkG, &pac);
         //Geistbewegung Geist 3
-        ghostMove(&pacPosition, &cyanPosition, &cyanG);
+        ghostMove(&pacPosition, &cyanPosition, &cyanG, &pac);
         //Geistbewegung Geist 4
-        ghostMove(&pacPosition, &brownPosition, &cyanG);
+        ghostMove(&pacPosition, &brownPosition, &cyanG, &pac);
+        //SDL_RenderDrawPoint(renderer, brownG.targetX, brownG.targetY);
 
         SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, ghostRedTex, NULL, &redPosition, redG.rotation, NULL, SDL_FLIP_NONE);
@@ -424,6 +427,9 @@ int main(void)
                 break;
         }
 
+        printf("Muenzen: %d Apfel: %d\r", munzenzahler, apfel);
+        frame++;
+
         time(&end_t);
         diff_t = difftime(end_t, start_t);
         fpsDiff = 60 - diff_t;
@@ -432,7 +438,8 @@ int main(void)
         SDL_Delay(1000/fpsDiff);
     }
     
-    free(buffer);
+    ENDE:
+
     SDL_FreeSurface(image);
     SDL_FreeSurface(backSurface);
     SDL_FreeSurface(mapElements);
