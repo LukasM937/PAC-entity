@@ -8,6 +8,7 @@ typedef struct player
     int targetX;
     int targetY;
     int ghostType;
+    int collision;
 } player;
 
 bool canimoveV2(int *was, int speed, int pox, int poy, int pox1, int poy1, int *munzenzahler, int *apfel)
@@ -140,16 +141,8 @@ void setTarget(player *ghostStuff, player *pacStuff)
         ghostStuff->targetY = abs(pacStuff->y - ghostStuff->targetY) + pacStuff->y;
         break;
     case 4:
-        if((abs(pacStuff->x - ghostStuff->x) + abs(pacStuff->x - ghostStuff->x)) <= 400)
-        {
-            ghostStuff->targetX = 450;
-            ghostStuff->targetY = 800;
-        }
-        else
-        {
-            ghostStuff->targetX = pacStuff->x;
-            ghostStuff->targetY = pacStuff->y;
-        }
+        ghostStuff->targetX = pacStuff->x;
+        ghostStuff->targetY = pacStuff->y;
         break;
     
     default:
@@ -163,6 +156,59 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
     pacStuff->y = pac->y;
 
     setTarget(ghostStuff, pacStuff);
+
+    /*if (ghostStuff->collision > 0)
+    {
+        switch (ghostStuff->collision)
+        {
+        case 1:
+            if (canimove(ghost->x, ghost->y - BUMPER, ghost->x + ghost->w, ghost->y - BUMPER) == false)
+            {
+                ghost->x += ghostStuff->speed;
+            }
+            else
+            {
+                ghost->y -= ghostStuff->speed;
+                ghostStuff->collision = 0;
+            }
+            break;
+        case 2:
+            if (canimove(ghost->x + ghost->w + BUMPER, ghost->y, ghost->x + ghost->w + BUMPER, ghost->y + ghost->h) == false)
+            {
+                ghost->y += ghostStuff->speed;
+            }
+            else
+            {
+                ghost->x += ghostStuff->speed;
+                ghostStuff->collision = 0;
+            }
+            break;
+        case 3:
+            if (canimove(ghost->x, ghost->y + ghost->h + BUMPER, ghost->x + ghost->w, ghost->y + ghost->h + BUMPER) == false)
+            {
+
+                ghost->x += ghostStuff->speed;
+            }
+            else
+            {
+                ghost->y += ghostStuff->speed;
+                ghostStuff->collision = 0;
+            }
+            break;
+        case 4:
+            if (canimove(ghost->x, ghost->y + ghost->h + BUMPER, ghost->x + ghost->w, ghost->y + ghost->h + BUMPER) == false)
+            {
+                ghost->x -= ghostStuff->speed;
+            }
+            else
+            {
+                ghost->y += ghostStuff->speed;
+                ghostStuff->collision = 0;
+            }
+            break;
+        }
+
+    }*/
 
     if (ghostStuff->targetY < ghost->y) 
     {
@@ -178,7 +224,10 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 {
                     ghost->x -= ghostStuff->speed;
                 }
-
+                // else
+                // {
+                //     ghostStuff->collision = 1;
+                // }
             }
             else 
             {
@@ -186,6 +235,10 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 {
                     ghost->x += ghostStuff->speed;
                 }
+                // else
+                // {
+                //     ghostStuff->collision = 2;
+                // }
             }   
         }
     }
@@ -220,8 +273,10 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 {
                     ghost->x -= ghostStuff->speed;
                 }
-                
-                
+                // else
+                // {
+                //     ghostStuff->collision = 3;
+                // }
             }
             else 
             {
@@ -229,6 +284,10 @@ void ghostMove (SDL_Rect *pac, SDL_Rect *ghost, player *ghostStuff, player *pacS
                 {
                     ghost->x += ghostStuff->speed;
                 }
+                // else
+                // {
+                //     ghostStuff->collision = 4;
+                // }
             }
         }
     }
@@ -271,7 +330,7 @@ void randApple(int frame, int *ranX, int *ranY)
     }
 }
 
-int collision(SDL_Rect *pac, SDL_Rect *red, SDL_Rect *pink, SDL_Rect *cyan, SDL_Rect *brown, int *apfel)
+int collisions(SDL_Rect *pac, SDL_Rect *red, SDL_Rect *pink, SDL_Rect *cyan, SDL_Rect *brown, int *apfel)
 {
     if(abs(pac->x - red->x) <= BUMPER)
     {

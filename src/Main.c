@@ -61,6 +61,11 @@ int main(void)
     cyanG.ghostType = 3;
     brownG.ghostType = 4;
 
+    redG.collision = 0;
+    pinkG.collision = 0;
+    cyanG.collision = 0;
+    brownG.collision = 0;
+
     SDL_Texture* ghostRedTex = NULL;
     SDL_Texture* ghostPinkTex = NULL;
     SDL_Texture* ghostCyanTex = NULL;
@@ -303,7 +308,7 @@ int main(void)
             }
         }
 
-        if(collision(&pacPosition, &redPosition, &pinkPosition, &cyanPosition, &brownPosition, &apfel) == 0)
+        if(collisions(&pacPosition, &redPosition, &pinkPosition, &cyanPosition, &brownPosition, &apfel) == 0)
         {
             apfel--;
         }
@@ -353,6 +358,9 @@ int main(void)
         cyanG.y = cyanPosition.y;
         cyanG.targetX = redPosition.x;
         cyanG.targetY = redPosition.y;
+
+        brownG.x = brownPosition.x;
+        brownG.y = brownPosition.y;
         
         //Geistbewegung Geist 1
         ghostMove(&pacPosition, &redPosition, &redG, &pac);
@@ -361,7 +369,7 @@ int main(void)
         //Geistbewegung Geist 3
         ghostMove(&pacPosition, &cyanPosition, &cyanG, &pac);
         //Geistbewegung Geist 4
-        ghostMove(&pacPosition, &brownPosition, &cyanG, &pac);
+        ghostMove(&pacPosition, &brownPosition, &brownG, &pac);
         //SDL_RenderDrawPoint(renderer, brownG.targetX, brownG.targetY);
 
         SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
