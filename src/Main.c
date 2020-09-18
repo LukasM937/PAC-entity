@@ -30,7 +30,6 @@ int main(void)
     double diff_t;
     int fpsDiff;
     int frame = 1;
-    int frameCounter = 1;
     int ranX = 9;
     int ranY = 12;
 
@@ -61,6 +60,11 @@ int main(void)
     pinkG.ghostType = 2;
     cyanG.ghostType = 3;
     brownG.ghostType = 4;
+
+    redG.collision = 0;
+    pinkG.collision = 0;
+    cyanG.collision = 0;
+    brownG.collision = 0;
 
     SDL_Texture* ghostRedTex = NULL;
     SDL_Texture* ghostPinkTex = NULL;
@@ -304,7 +308,7 @@ int main(void)
             }
         }
 
-        if(collision(&pacPosition, &redPosition, &pinkPosition, &cyanPosition, &brownPosition, &apfel) == 0)
+        if(collisions(&pacPosition, &redPosition, &pinkPosition, &cyanPosition, &brownPosition, &apfel) == 0)
         {
             apfel--;
         }
@@ -359,13 +363,13 @@ int main(void)
         brownG.y = brownPosition.y;
         
         //Geistbewegung Geist 1
-        ghostMove(&pacPosition, &redPosition, &redG, &pac, &frameCounter);
+        ghostMove(&pacPosition, &redPosition, &redG, &pac);
         //Geistbewegung Geist 2
-        ghostMove(&pacPosition, &pinkPosition, &pinkG, &pac, &frameCounter);
+        ghostMove(&pacPosition, &pinkPosition, &pinkG, &pac);
         //Geistbewegung Geist 3
-        ghostMove(&pacPosition, &cyanPosition, &cyanG, &pac, &frameCounter);
+        ghostMove(&pacPosition, &cyanPosition, &cyanG, &pac);
         //Geistbewegung Geist 4
-        ghostMove(&pacPosition, &brownPosition, &brownG, &pac, &frameCounter);
+        ghostMove(&pacPosition, &brownPosition, &brownG, &pac);
         //SDL_RenderDrawPoint(renderer, brownG.targetX, brownG.targetY);
 
         SDL_RenderCopyEx(renderer, pacEntity, NULL, &pacPosition, pac.rotation, NULL, SDL_FLIP_NONE);
@@ -431,7 +435,7 @@ int main(void)
                 break;
         }
 
-        //printf("Muenzen: %d Apfel: %d\r", munzenzahler, apfel);
+        printf("Muenzen: %d Apfel: %d\r", munzenzahler, apfel);
         frame++;
 
         time(&end_t);
